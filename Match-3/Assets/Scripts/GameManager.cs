@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
-
 public class GameManager : MonoBehaviour
 {
     [Header("Grid Setup")]
@@ -12,13 +10,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject tilePrefab;
     [SerializeField] private GameObject blockPrefab;
     [Header("Block Types")] public List<BLOCK_TYPES> types;
-    public void Start()
+    void Start()
     {
         CreateGrid();
-        PositionCamera();
+        CenterCameraOnGrid();
         InstantiateBlocks();
     }
-    public void CreateGrid()
+    void CreateGrid()
     {
         GameObject grid = new GameObject("Grid");
         for (int i = 0; i < rows; i++)
@@ -31,7 +29,7 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-    public void PositionCamera()
+    void CenterCameraOnGrid()
     {
         Camera camera = FindObjectOfType<Camera>();
         float x = (float)rows / 2 - 0.5f;
@@ -39,7 +37,7 @@ public class GameManager : MonoBehaviour
         Vector3 position = new Vector3(x, y, -100);
         camera.transform.position = position;
     }
-    public void InstantiateBlocks()
+    void InstantiateBlocks()
     {
         GameObject blocks = new GameObject("Blocks");
         for (int i = 0; i < rows; i++)
