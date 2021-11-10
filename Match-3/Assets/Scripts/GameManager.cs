@@ -11,13 +11,14 @@ public class GameManager : MonoBehaviour
     }
     public void CreateGrid()
     {
-        GameObject gridPrefab = new GameObject("Grid");
+        GameObject grid = new GameObject("Grid");
         for (int i = 0; i < rows; i++)
         {
             for (int j = 0; j < columns; j++)
             {
-                Vector2 posistion = new Vector2(i, j);
-                Instantiate(tilePrefab, posistion, Quaternion.identity, gridPrefab.transform);
+                Vector2 posistion = new Vector2(j, i);
+                GameObject tile = Instantiate(tilePrefab, posistion, Quaternion.identity, grid.transform);
+                tile.name = "Tile " + i +" "+ j;
             }
         }
     }
