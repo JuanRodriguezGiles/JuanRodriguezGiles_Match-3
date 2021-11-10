@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -5,6 +6,7 @@ public class PlayerInput : MonoBehaviour
 {
     [SerializeField] private LayerMask inputLayer;
     public List<GameObject> selectedBlocks;
+    public static event Action<List<GameObject>> OnMouseReleased;
     void Start()
     {
         selectedBlocks = new List<GameObject>();
@@ -22,7 +24,7 @@ public class PlayerInput : MonoBehaviour
         }
         else
         {
-            ClearBlocks();
+            OnMouseReleased?.Invoke(selectedBlocks);
         }
     }
     void SelectBlock(GameObject block)
@@ -46,10 +48,6 @@ public class PlayerInput : MonoBehaviour
             }
         }
     }
-    void ClearBlocks()
-    {
-
-    }
     bool IsSelectValid(GameObject block)
     {
         GameObject lastBlock = selectedBlocks[selectedBlocks.Count - 1];
@@ -58,7 +56,7 @@ public class PlayerInput : MonoBehaviour
         Collider2D[] hits;
         hits = Physics2D.OverlapBoxAll(position, new Vector2(2, 2), 0, inputLayer);
 
-        return hits.Any(VARIABLE => VARIABLE.gameObject.GetInstanceID() == block.GetInstanceID() && VARIABLE.gameObject.CompareTag(lastBlock.tag));
+        return hits.Any(blocks => blocks.gameObject.GetInstanceID() == block.GetInstanceID() && blocks.gameObject.CompareTag(lastBlock.tag));
     }
     bool SelectedPreviousBlock(GameObject block)
     {

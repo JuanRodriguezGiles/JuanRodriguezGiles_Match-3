@@ -3,13 +3,22 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 public class GameManager : MonoBehaviour
 {
-    [Header("Grid Setup")]
-    [Range(3, 8)] public int rows;
-    [Range(3, 8)] public int columns;
+    [Header("Game Setup")]
+    [Range(3, 8)] public int rows = 3;
+    [Range(3, 8)] public int columns = 3;
+    public List<BLOCK_TYPES> blockTypes;
+    [Range(2, 10)] public int minMatchNumber;
     [Header("Prefabs")]
     [SerializeField] private GameObject tilePrefab;
     [SerializeField] private GameObject blockPrefab;
-    [Header("Block Types")] public List<BLOCK_TYPES> types;
+    void OnEnable()
+    {
+        PlayerInput.OnMouseReleased += ClearBlocks;
+    }
+    void OnDisable()
+    {
+        PlayerInput.OnMouseReleased -= ClearBlocks;
+    }
     void Start()
     {
         CreateGrid();
@@ -48,8 +57,27 @@ public class GameManager : MonoBehaviour
                 Block block = new Block();
                 block.prefab = Instantiate(blockPrefab, position, Quaternion.identity, blocks.transform);
                 block.prefab.name = "Block " + i + " " + j;
-                block.SetBlockType(Random.Range(0, types.Count));
+                block.SetBlockType(Random.Range(0, blockTypes.Count));
             }
         }
+    }
+
+    void ClearBlocks(List<GameObject> blocks)
+    {
+        if (blocks.Count >= minMatchNumber)
+        {
+            foreach (var block in blocks)
+            {
+                Destroy(block);
+            }
+        }
+        else
+        {
+            foreach (var block in blocks)
+            {
+                block.GetComponent<SpriteRenderer>().color = Color.white;
+            }
+        }
+        blocks.Clear();
     }
 }

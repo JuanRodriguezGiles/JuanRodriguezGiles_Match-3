@@ -168,9 +168,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rows: 8
   columns: 8
+  blockTypes: 00000000010000000200000003000000
+  minMatchNumber: 3
   tilePrefab: {fileID: 2499393868194984505, guid: 625e604eec7462b429c98123c596bfa8, type: 3}
   blockPrefab: {fileID: 7469547034532225541, guid: 763ea70dfa31d1647bebfdeb654fce7a, type: 3}
-  types: 0000000001000000020000000300000004000000
 --- !u!1 &122016774
 GameObject:
   m_ObjectHideFlags: 0
@@ -475,6 +476,7 @@ MonoBehaviour:
   inputLayer:
     serializedVersion: 2
     m_Bits: 64
+  selectedBlocks: []
 --- !u!1 &2147070721
 GameObject:
   m_ObjectHideFlags: 0
