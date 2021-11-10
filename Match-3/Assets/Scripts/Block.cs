@@ -15,6 +15,16 @@ public enum BLOCK_TYPES
 };
 public class Block
 {
-    public GameObject blockPrefab;
     public BLOCK_TYPES type;
+    public GameObject prefab;
+    public void SetBlockType(int typeIndex)
+    {
+        BLOCK_TYPES currentType = (BLOCK_TYPES)typeIndex;
+        type = currentType;
+        prefab.tag = type.ToString();
+
+        SpriteRenderer renderer = prefab.GetComponent<SpriteRenderer>();
+        string path = "Art/Sprites/Blocks/" + type.ToString();
+        renderer.sprite = Resources.Load<Sprite>(path);
+    }
 }

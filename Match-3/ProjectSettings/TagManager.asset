@@ -3,7 +3,18 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - AIR
+  - ARTHROPODA
+  - DEMON
+  - EARTH
+  - FIRE
+  - FLASH
+  - FOREST
+  - ICE
+  - LINDWORM
+  - SPIRIT
+  - WATER
   layers:
   - Default
   - TransparentFX
