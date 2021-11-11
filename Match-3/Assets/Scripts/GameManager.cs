@@ -4,8 +4,8 @@ using Random = UnityEngine.Random;
 public class GameManager : MonoBehaviour
 {
     [Header("Game Setup")]
-    [Range(3, 8)] public int rows = 3;
-    [Range(3, 8)] public int columns = 3;
+    [Range(3, 8)] public int rows;
+    [Range(3, 8)] public int columns;
     public List<BLOCK_TYPES> blockTypes;
     [Range(2, 10)] public int minMatchNumber;
     [Header("Prefabs")]
@@ -48,20 +48,34 @@ public class GameManager : MonoBehaviour
     }
     void InstantiateBlocks()
     {
+        BLOCK_TYPES[] previousLeft = new BLOCK_TYPES[rows];
+        BLOCK_TYPES previousDown = BLOCK_TYPES.AIR;
+
         GameObject blocks = new GameObject("Blocks");
-        for (int i = 0; i < rows; i++)
+
+        for (int i = 0; i < rows; i++) //TODO tidy up code for pre match detection?
         {
             for (int j = 0; j < columns; j++)
             {
-                Vector2 position = new Vector2(j, i);
+                Vector2 position = new Vector2(i, j);
                 Block block = new Block();
                 block.prefab = Instantiate(blockPrefab, position, Quaternion.identity, blocks.transform);
-                block.prefab.name = "Block " + i + " " + j;
-                block.SetBlockType(Random.Range(0, blockTypes.Count));
+                block.prefab.name = "Block";
+
+                List<BLOCK_TYPES> possibleCharacters = new List<BLOCK_TYPES>();
+                possibleCharacters.AddRange(blockTypes);
+
+                possibleCharacters.Remove(previousLeft[j]);
+                possibleCharacters.Remove(previousDown);
+
+                int type = (int)possibleCharacters[Random.Range(0, possibleCharacters.Count)];
+                block.SetBlockType(type);
+
+                previousLeft[j] = (BLOCK_TYPES)type;
+                previousDown = (BLOCK_TYPES)type;
             }
         }
     }
-
     void ClearBlocks(List<GameObject> blocks)
     {
         if (blocks.Count >= minMatchNumber)

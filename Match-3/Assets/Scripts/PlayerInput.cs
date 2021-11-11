@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerInput : MonoBehaviour
 {
     [SerializeField] private LayerMask inputLayer;
-    public List<GameObject> selectedBlocks;
+    private List<GameObject> selectedBlocks;
     public static event Action<List<GameObject>> OnMouseReleased;
     void Start()
     {
