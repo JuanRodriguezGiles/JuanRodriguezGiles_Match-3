@@ -476,7 +476,6 @@ MonoBehaviour:
   inputLayer:
     serializedVersion: 2
     m_Bits: 64
-  selectedBlocks: []
 --- !u!1 &2147070721
 GameObject:
   m_ObjectHideFlags: 0
