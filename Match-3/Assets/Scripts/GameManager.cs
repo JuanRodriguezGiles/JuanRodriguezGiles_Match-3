@@ -1,30 +1,34 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
+
 public class GameManager : MonoBehaviour
 {
-    [Header("Game Setup")]
-    [Range(3, 8)] public int rows;
+    [Header("Game Setup")] [Range(3, 8)] public int rows;
     [Range(3, 8)] public int columns;
     public List<BLOCK_TYPES> blockTypes;
     [Range(2, 10)] public int minMatchNumber;
-    [Header("Prefabs")]
-    [SerializeField] private GameObject tilePrefab;
+    [Header("Prefabs")] [SerializeField] private GameObject tilePrefab;
     [SerializeField] private GameObject blockPrefab;
+    private GameObject blocks;
     void OnEnable()
     {
         PlayerInput.OnMouseReleased += ClearBlocks;
     }
+
     void OnDisable()
     {
         PlayerInput.OnMouseReleased -= ClearBlocks;
     }
+
     void Start()
     {
         CreateGrid();
         CenterCameraOnGrid();
         InstantiateBlocks();
+
     }
+
     void CreateGrid()
     {
         GameObject grid = new GameObject("Grid");
@@ -38,6 +42,7 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+
     void CenterCameraOnGrid()
     {
         Camera camera = FindObjectOfType<Camera>();
@@ -46,12 +51,12 @@ public class GameManager : MonoBehaviour
         Vector3 position = new Vector3(x, y, -100);
         camera.transform.position = position;
     }
+
     void InstantiateBlocks()
     {
         BLOCK_TYPES[] previousLeft = new BLOCK_TYPES[rows];
         BLOCK_TYPES previousDown = BLOCK_TYPES.AIR;
-
-        GameObject blocks = new GameObject("Blocks");
+        blocks = new GameObject("Blocks"); //Parent go for blocks
 
         for (int i = 0; i < rows; i++) //TODO tidy up code for pre match detection?
         {
@@ -76,6 +81,7 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+
     void ClearBlocks(List<GameObject> blocks)
     {
         if (blocks.Count >= minMatchNumber)
@@ -84,6 +90,7 @@ public class GameManager : MonoBehaviour
             {
                 Destroy(block);
             }
+            RefillGrid();
         }
         else
         {
@@ -92,6 +99,31 @@ public class GameManager : MonoBehaviour
                 block.GetComponent<SpriteRenderer>().color = Color.white;
             }
         }
+
         blocks.Clear();
+    }
+
+    void RefillGrid()
+    {
+        List<Vector2> emptyTilesPos = new List<Vector2>();
+        for (int i = 0; i < rows; i++) //Find empty tiles
+        {
+            for (int j = 0; j < columns; j++)
+            {
+                Collider2D block = Physics2D.OverlapPoint(new Vector2(j, i));
+                if (!block)
+                {
+                    emptyTilesPos.Add(new Vector2(j, i));
+                }
+            }
+        }
+
+        foreach (var position in emptyTilesPos)
+        {
+            Block block = new Block();
+            block.prefab = Instantiate(blockPrefab, position, Quaternion.identity, blocks.transform);
+            block.prefab.name = "Block";
+            block.SetBlockType(Random.Range(0, blockTypes.Count));
+        }
     }
 }
