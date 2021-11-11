@@ -114,7 +114,6 @@ public class GameManager : MonoBehaviour
                 block.GetComponent<SpriteRenderer>().color = Color.white;
             }
         }
-
         selectedBlocks.Clear();
     }
 
@@ -128,7 +127,7 @@ public class GameManager : MonoBehaviour
             block.prefab.name = "Block";
             block.SetBlockType(Random.Range(0, blockTypes.Count));
         }
-        for (int i = 0; i < rows; i++) 
+        for (int i = 0; i < rows; i++)
         {
             for (int j = 0; j < columns; j++)
             {
@@ -170,27 +169,53 @@ public class GameManager : MonoBehaviour
 
     void CheckMatches(GameObject block)
     {
+        List<GameObject> matchedBlocks = new List<GameObject>();
+        bool matched = false;
         Vector2 pos = new Vector2(block.transform.position.x, block.transform.position.y);
-        RaycastHit2D[] hitUp = Physics2D.RaycastAll(pos, Vector2.up, minMatchNumber-1);
-        RaycastHit2D[] hitDown = Physics2D.RaycastAll(pos, Vector2.down, minMatchNumber-1);
-        RaycastHit2D[] hitLeft = Physics2D.RaycastAll(pos, Vector2.left, minMatchNumber-1);
-        RaycastHit2D[] hitRight = Physics2D.RaycastAll(pos, Vector2.right, minMatchNumber-1);
+        RaycastHit2D[] hitUp = Physics2D.RaycastAll(pos, Vector2.up, minMatchNumber - 1);
+        RaycastHit2D[] hitDown = Physics2D.RaycastAll(pos, Vector2.down, minMatchNumber - 1);
+        RaycastHit2D[] hitLeft = Physics2D.RaycastAll(pos, Vector2.left, minMatchNumber - 1);
+        RaycastHit2D[] hitRight = Physics2D.RaycastAll(pos, Vector2.right, minMatchNumber - 1);
 
-        if (hitUp.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag)&&hitUp.Length>=minMatchNumber))
+        if (hitUp.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitUp.Length >= minMatchNumber) && !matched)
         {
             Debug.Log("matchup");
+            for (int i = 0; i < hitUp.Length; i++)
+            {
+                matchedBlocks.Add(hitUp[i].transform.gameObject);
+            }
+            ClearBlocks(matchedBlocks);
+            matched = true;
         }
         if (hitDown.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitDown.Length >= minMatchNumber))
         {
             Debug.Log("matchdown");
+            for (int i = 0; i < hitDown.Length; i++)
+            {
+                matchedBlocks.Add(hitDown[i].transform.gameObject);
+            }
+            ClearBlocks(matchedBlocks);
+            matched = true;
         }
         if (hitLeft.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitLeft.Length >= minMatchNumber))
         {
             Debug.Log("matchleft");
+            for (int i = 0; i < hitLeft.Length; i++)
+            {
+                matchedBlocks.Add(hitLeft[i].transform.gameObject);
+            }
+            ClearBlocks(matchedBlocks);
+            matched = true;
         }
         if (hitRight.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitRight.Length >= minMatchNumber))
         {
             Debug.Log("matchright");
+            for (int i = 0; i < hitLeft.Length; i++)
+            {
+                matchedBlocks.Add(hitLeft[i].transform.gameObject);
+            }
+            ClearBlocks(matchedBlocks);
+            matched = true;
         }
     }
 
