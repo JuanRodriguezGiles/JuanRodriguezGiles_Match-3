@@ -171,6 +171,7 @@ public class GameManager : MonoBehaviour
             foreach (var block in selectedBlocks)
             {
                 block.GetComponent<SpriteRenderer>().color = Color.white;
+                block.GetComponent<Animator>().SetBool("Selected", false);
             }
         }
         selectedBlocks.Clear();

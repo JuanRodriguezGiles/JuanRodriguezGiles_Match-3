@@ -43,22 +43,25 @@ public class PlayerInput : MonoBehaviour
 
     void SelectBlock(GameObject block)
     {
-        if (selectedBlocks.Count == 0)
+        if (selectedBlocks.Count == 0) //No active chain
         {
             selectedBlocks.Add(block);
-            block.GetComponent<SpriteRenderer>().color = Color.green; //TODO flashing animation?
+            block.GetComponent<SpriteRenderer>().color = Color.green; 
+            block.GetComponent<Animator>().SetBool("Selected", true);
         }
         else if (IsSelectValid(block))
         {
             if (SelectedPreviousBlock(block))
             {
-                selectedBlocks[selectedBlocks.Count - 1].gameObject.GetComponent<SpriteRenderer>().color = Color.white;
+                selectedBlocks[selectedBlocks.Count - 1].GetComponent<SpriteRenderer>().color = Color.white;
+                selectedBlocks[selectedBlocks.Count - 1].GetComponent<Animator>().SetBool("Selected", false);
                 selectedBlocks.RemoveAt(selectedBlocks.Count - 1);
             }
             else if (!AlreadySelected(block))
             {
                 selectedBlocks.Add(block);
-                block.GetComponent<SpriteRenderer>().color = Color.green; //TODO flashing animation?
+                block.GetComponent<SpriteRenderer>().color = Color.green; 
+                block.GetComponent<Animator>().SetBool("Selected", true);
             }
         }
     }
