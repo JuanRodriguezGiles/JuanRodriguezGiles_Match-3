@@ -86,7 +86,7 @@ public class GameManager : MonoBehaviour
                 previousDown = (BLOCK_TYPES)type;
 
                 grid[i, j] = block.prefab;
-                yield return new WaitForSeconds(0.1f);
+                yield return new WaitForSeconds(0.05f);
             }
         }
     }
@@ -96,17 +96,16 @@ public class GameManager : MonoBehaviour
         if (selectedBlocks.Count >= minMatchNumber)
         {
             GetGrid();
-            foreach (var _block in selectedBlocks)
+            foreach (var block in selectedBlocks)
             {
-                if (_block)
-                {
-                    int x = (int)_block.transform.position.x;
-                    int y = (int)_block.transform.position.y;
-                    grid[y, x] = null;
-                    Destroy(_block.gameObject);
-                }
+                if (!block) continue;
+                int x = (int)block.transform.position.x;
+                int y = (int)block.transform.position.y;
+                grid[y, x] = null;
+                block.GetComponent<Animator>().SetTrigger("OnDespawn");
+                Destroy(block.gameObject,1);
             }
-            RefillGrid();
+            StartCoroutine(RefillGrid());
         }
         else
         {
@@ -118,8 +117,9 @@ public class GameManager : MonoBehaviour
         selectedBlocks.Clear();
     }
 
-    void RefillGrid()
+    IEnumerator RefillGrid()
     {
+        yield return new WaitForSeconds(1.1f);
         List<Vector2> emptyTilesPos = GetEmptyTiles();
         foreach (var position in emptyTilesPos)
         {
@@ -167,7 +167,6 @@ public class GameManager : MonoBehaviour
             yield return null;
         }
     }
-
     void CheckMatches(GameObject block)
     {
         List<GameObject> matchedBlocks = new List<GameObject>();
@@ -180,7 +179,6 @@ public class GameManager : MonoBehaviour
 
         if (hitUp.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitUp.Length >= minMatchNumber) && !matched)
         {
-            Debug.Log("matchup");
             for (int i = 0; i < hitUp.Length; i++)
             {
                 matchedBlocks.Add(hitUp[i].transform.gameObject);
@@ -190,7 +188,6 @@ public class GameManager : MonoBehaviour
         }
         if (hitDown.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitDown.Length >= minMatchNumber))
         {
-            Debug.Log("matchdown");
             for (int i = 0; i < hitDown.Length; i++)
             {
                 matchedBlocks.Add(hitDown[i].transform.gameObject);
@@ -200,7 +197,6 @@ public class GameManager : MonoBehaviour
         }
         if (hitLeft.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitLeft.Length >= minMatchNumber))
         {
-            Debug.Log("matchleft");
             for (int i = 0; i < hitLeft.Length; i++)
             {
                 matchedBlocks.Add(hitLeft[i].transform.gameObject);
@@ -210,7 +206,6 @@ public class GameManager : MonoBehaviour
         }
         if (hitRight.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitRight.Length >= minMatchNumber))
         {
-            Debug.Log("matchright");
             for (int i = 0; i < hitLeft.Length; i++)
             {
                 matchedBlocks.Add(hitLeft[i].transform.gameObject);
