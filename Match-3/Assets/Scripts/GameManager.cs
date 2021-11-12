@@ -31,7 +31,7 @@ public class GameManager : MonoBehaviour
     {
         CreateGrid();
         CenterCameraOnGrid();
-        InstantiateBlocks();
+        StartCoroutine(InstantiateBlocks());
     }
 
     void CreateGrid()
@@ -57,7 +57,7 @@ public class GameManager : MonoBehaviour
         camera.transform.position = position;
     }
 
-    void InstantiateBlocks()
+    IEnumerator InstantiateBlocks()
     {
         grid = new GameObject[rows, columns];
         BLOCK_TYPES[] previousLeft = new BLOCK_TYPES[rows];
@@ -86,6 +86,7 @@ public class GameManager : MonoBehaviour
                 previousDown = (BLOCK_TYPES)type;
 
                 grid[i, j] = block.prefab;
+                yield return new WaitForSeconds(0.1f);
             }
         }
     }
