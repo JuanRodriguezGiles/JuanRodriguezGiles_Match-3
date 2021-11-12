@@ -89,19 +89,17 @@ public class GameManager : MonoBehaviour
                 yield return new WaitForSeconds(0.05f);
             }
         }
+        PlayerInput.allowed = true;
     }
 
     void ClearBlocks(List<GameObject> selectedBlocks)
     {
         if (selectedBlocks.Count >= minMatchNumber)
         {
-            GetGrid();
+            PlayerInput.allowed = false;
             foreach (var block in selectedBlocks)
             {
                 if (!block) continue;
-                int x = (int)block.transform.position.x;
-                int y = (int)block.transform.position.y;
-                grid[y, x] = null;
                 block.GetComponent<Animator>().SetTrigger("OnDespawn");
                 Destroy(block.gameObject,1);
             }
@@ -119,7 +117,7 @@ public class GameManager : MonoBehaviour
 
     IEnumerator RefillGrid()
     {
-        yield return new WaitForSeconds(1.1f);
+        yield return new WaitForSeconds(1);
         List<Vector2> emptyTilesPos = GetEmptyTiles();
         foreach (var position in emptyTilesPos)
         {
@@ -177,7 +175,7 @@ public class GameManager : MonoBehaviour
         RaycastHit2D[] hitLeft = Physics2D.RaycastAll(pos, Vector2.left, minMatchNumber - 1);
         RaycastHit2D[] hitRight = Physics2D.RaycastAll(pos, Vector2.right, minMatchNumber - 1);
 
-        if (hitUp.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitUp.Length >= minMatchNumber) && !matched)
+        if (hitUp.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitUp.Length >= minMatchNumber))
         {
             for (int i = 0; i < hitUp.Length; i++)
             {
@@ -186,7 +184,7 @@ public class GameManager : MonoBehaviour
             ClearBlocks(matchedBlocks);
             matched = true;
         }
-        if (hitDown.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitDown.Length >= minMatchNumber))
+        if (hitDown.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitDown.Length >= minMatchNumber && !matched))
         {
             for (int i = 0; i < hitDown.Length; i++)
             {
@@ -195,7 +193,7 @@ public class GameManager : MonoBehaviour
             ClearBlocks(matchedBlocks);
             matched = true;
         }
-        if (hitLeft.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitLeft.Length >= minMatchNumber))
+        if (hitLeft.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitLeft.Length >= minMatchNumber && !matched))
         {
             for (int i = 0; i < hitLeft.Length; i++)
             {
@@ -204,15 +202,16 @@ public class GameManager : MonoBehaviour
             ClearBlocks(matchedBlocks);
             matched = true;
         }
-        if (hitRight.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitRight.Length >= minMatchNumber))
+        if (hitRight.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitRight.Length >= minMatchNumber && !matched))
         {
-            for (int i = 0; i < hitLeft.Length; i++)
+            for (int i = 0; i < hitRight.Length; i++)
             {
-                matchedBlocks.Add(hitLeft[i].transform.gameObject);
+                matchedBlocks.Add(hitRight[i].transform.gameObject);
             }
             ClearBlocks(matchedBlocks);
             matched = true;
         }
+        PlayerInput.allowed = true;
     }
 
     void GetGrid()

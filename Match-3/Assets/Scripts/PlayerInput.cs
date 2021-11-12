@@ -7,13 +7,14 @@ public class PlayerInput : MonoBehaviour
     [SerializeField] private LayerMask inputLayer;
     private List<GameObject> selectedBlocks;
     public static event Action<List<GameObject>> OnMouseReleased;
+    public static bool allowed = false;
     void Start()
     {
         selectedBlocks = new List<GameObject>();
     }
     void Update()
     {
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0) && allowed) 
         {
             Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Collider2D block = Physics2D.OverlapPoint(mousePosition, inputLayer);
