@@ -24,7 +24,11 @@ public class SoundtrackController : MonoBehaviour
         maxMoves = maxMoves == 0 ? moves : maxMoves;
 
         percentage = ((float)moves / (float)maxMoves) * 100;
-        if (percentage <= 25)
+        if (moves == 0)
+        {
+            audio.pitch = 1;
+        }
+        else if (percentage <= 25 || moves == 1)
         {
             audio.pitch = 1.25f;
         }

@@ -169,7 +169,7 @@ MonoBehaviour:
   rows: 8
   columns: 7
   minMatchNumber: 3
-  moves: 10
+  moves: 3
   blockTypes: 00000000010000000200000003000000
   spawnType: 3
   spawnTime: 0.0523
@@ -1715,6 +1715,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1311ac4a040ad8646bae1799927f8879, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  percentage: 0
 --- !u!1 &2147070721
 GameObject:
   m_ObjectHideFlags: 0
