@@ -20,26 +20,40 @@ public class GameManager : MonoBehaviour
     private GameObject blocks;
     private GameObject[,] grid;
     private int score = 0;
+    private int movesLeft;
 
     public static event Action<int> OnScoreChange;
     public static event Action<int> OnMovesChange;
+    public static event Action OnGameOver;
 
     void OnEnable()
     {
         PlayerInput.OnMouseReleased += ClearBlocks;
+        UiGameplay.OnPlayButtonPressed += Restart;
     }
 
     void OnDisable()
     {
         PlayerInput.OnMouseReleased -= ClearBlocks;
+        UiGameplay.OnPlayButtonPressed -= Restart;
     }
 
     void Start()
     {
         CreateGrid();
         CenterCameraOnGrid();
-        StartCoroutine(InstantiateBlocks());
+        StartCoroutine(InstantiateBlocks(false));
+        movesLeft = moves;
         OnMovesChange?.Invoke(moves);
+    }
+
+    void Restart()
+    {
+        score = 0;
+        OnScoreChange?.Invoke(0);
+        movesLeft = moves;
+        OnMovesChange?.Invoke(movesLeft);
+        StartCoroutine(InstantiateBlocks(true));
     }
 
     void CreateGrid()
@@ -65,12 +79,27 @@ public class GameManager : MonoBehaviour
         camera.transform.position = position;
     }
 
-    IEnumerator InstantiateBlocks()
+    IEnumerator InstantiateBlocks(bool restart)
     {
         grid = new GameObject[rows, columns];
         BLOCK_TYPES[] previousLeft = new BLOCK_TYPES[rows];
         BLOCK_TYPES previousDown = BLOCK_TYPES.AIR;
         blocks = new GameObject("Blocks"); //Parent go for blocks
+
+        if (restart)
+        {
+            for (int i = 0; i < rows; i++) 
+            {
+                for (int j = 0; j < columns; j++)
+                {
+                    Collider2D oldBlock = Physics2D.OverlapPoint(new Vector2(j, i)); //TODO use object pooling?
+                    if (oldBlock)
+                    {
+                        Destroy(oldBlock.gameObject);
+                    }
+                }
+            }
+        }
 
         for (int i = 0; i < rows; i++) //TODO tidy up code for pre match detection?
         {
@@ -97,6 +126,7 @@ public class GameManager : MonoBehaviour
                 yield return new WaitForSeconds(0.05f);
             }
         }
+
         PlayerInput.allowed = true;
     }
 
@@ -111,9 +141,13 @@ public class GameManager : MonoBehaviour
                 block.GetComponent<Animator>().SetTrigger("OnDespawn");
                 Destroy(block.gameObject, 1);
             }
+
             AddScore(selectedBlocks.Count);
             UpdateMovesLeft();
-            StartCoroutine(RefillGrid());
+            if (!CheckForGameOver())
+            {
+                StartCoroutine(RefillGrid());
+            }
         }
         else
         {
@@ -146,8 +180,14 @@ public class GameManager : MonoBehaviour
 
     void UpdateMovesLeft()
     {
-        moves--;
-        OnMovesChange?.Invoke(moves);
+        movesLeft--;
+        OnMovesChange?.Invoke(movesLeft);
+    }
+    bool CheckForGameOver()
+    {
+        if (movesLeft != 0) return false;
+        OnGameOver?.Invoke();
+        return true;
     }
 
     IEnumerator RefillGrid()
