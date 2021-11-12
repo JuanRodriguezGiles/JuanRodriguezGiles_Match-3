@@ -34,6 +34,7 @@ public class GameManager : MonoBehaviour
     public static event Action<int> OnScoreChange;
     public static event Action<int> OnMovesChange;
     public static event Action OnGameOver;
+    public static event Action OnClearBlocks;
 
     void OnEnable()
     {
@@ -175,6 +176,7 @@ public class GameManager : MonoBehaviour
             }
         }
         selectedBlocks.Clear();
+        OnClearBlocks?.Invoke();
     }
 
     void ClearCombo(List<GameObject> matchedBlocks)

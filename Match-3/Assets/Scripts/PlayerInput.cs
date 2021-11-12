@@ -7,6 +7,8 @@ public class PlayerInput : MonoBehaviour
     [SerializeField] private LayerMask inputLayer;
     private List<GameObject> selectedBlocks;
     public static event Action<List<GameObject>> OnMouseReleased;
+    public static event Action<GameObject> OnBlockSelected;
+    public static event Action OnBlockDeselected;
     public static bool allowed;
 
     void OnEnable()
@@ -35,7 +37,7 @@ public class PlayerInput : MonoBehaviour
                 SelectBlock(block.gameObject);
             }
         }
-        else
+        else if (selectedBlocks.Count > 0) 
         {
             OnMouseReleased?.Invoke(selectedBlocks);
         }
@@ -48,6 +50,7 @@ public class PlayerInput : MonoBehaviour
             selectedBlocks.Add(block);
             block.GetComponent<SpriteRenderer>().color = Color.green; 
             block.GetComponent<Animator>().SetBool("Selected", true);
+            OnBlockSelected?.Invoke(block.gameObject);
         }
         else if (IsSelectValid(block))
         {
@@ -56,12 +59,14 @@ public class PlayerInput : MonoBehaviour
                 selectedBlocks[selectedBlocks.Count - 1].GetComponent<SpriteRenderer>().color = Color.white;
                 selectedBlocks[selectedBlocks.Count - 1].GetComponent<Animator>().SetBool("Selected", false);
                 selectedBlocks.RemoveAt(selectedBlocks.Count - 1);
+                OnBlockDeselected?.Invoke();
             }
             else if (!AlreadySelected(block))
             {
                 selectedBlocks.Add(block);
                 block.GetComponent<SpriteRenderer>().color = Color.green; 
                 block.GetComponent<Animator>().SetBool("Selected", true);
+                OnBlockSelected?.Invoke(block.gameObject);
             }
         }
     }
