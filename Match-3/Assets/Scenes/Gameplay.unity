@@ -167,10 +167,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rows: 8
-  columns: 8
+  columns: 7
   minMatchNumber: 3
-  moves: 1
+  moves: 88
   blockTypes: 00000000010000000200000003000000
+  spawnType: 2
+  spawnTime: 0.0523
   tilePrefab: {fileID: 2499393868194984505, guid: 625e604eec7462b429c98123c596bfa8, type: 3}
   blockPrefab: {fileID: 7469547034532225541, guid: 763ea70dfa31d1647bebfdeb654fce7a, type: 3}
 --- !u!1 &122016774

@@ -4,14 +4,23 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
+public enum SPAWN_TYPES
+{
+    LEFT_RIGHT_UP,
+    RIGHT_LEFT_UP,
+    LEFT_RIGHT_DOWN,
+    RIGHT_LEFT_DOWN
+}
 public class GameManager : MonoBehaviour
 {
     [Header("Game Setup")]
-    [Range(3, 8)] public int rows;
-    [Range(3, 8)] public int columns;
-    [Range(2, 10)] public int minMatchNumber;
-    [Range(1, 100)] public int moves;
-    public List<BLOCK_TYPES> blockTypes;
+    [Range(3, 8)] [SerializeField] private int rows;
+    [Range(3, 8)] [SerializeField] private int columns;
+    [Range(2, 10)] [SerializeField] private int minMatchNumber;
+    [Range(1, 100)] [SerializeField] private int moves;
+    [SerializeField] private List<BLOCK_TYPES> blockTypes;
+    [SerializeField] private SPAWN_TYPES spawnType;
+    [Range(0.01f, 0.1f)] [SerializeField] private float spawnTime;
 
     [Header("Prefabs")]
     [SerializeField] private GameObject tilePrefab;
@@ -88,7 +97,7 @@ public class GameManager : MonoBehaviour
 
         if (restart)
         {
-            for (int i = 0; i < rows; i++) 
+            for (int i = 0; i < rows; i++)
             {
                 for (int j = 0; j < columns; j++)
                 {
@@ -105,7 +114,15 @@ public class GameManager : MonoBehaviour
         {
             for (int j = 0; j < columns; j++)
             {
-                Vector2 position = new Vector2(j, i);
+                Vector2 position = spawnType switch
+                {
+                    SPAWN_TYPES.LEFT_RIGHT_UP => new Vector2(j, i),
+                    SPAWN_TYPES.RIGHT_LEFT_UP => new Vector2(columns - 1 - j, i),
+                    SPAWN_TYPES.LEFT_RIGHT_DOWN => new Vector2(j, rows - 1 - i),
+                    SPAWN_TYPES.RIGHT_LEFT_DOWN => new Vector2(columns - 1 - j, rows - 1 - i),
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+
                 Block block = new Block();
                 block.prefab = Instantiate(blockPrefab, position, Quaternion.identity, blocks.transform);
                 block.prefab.name = "Block";
@@ -123,7 +140,7 @@ public class GameManager : MonoBehaviour
                 previousDown = (BLOCK_TYPES)type;
 
                 grid[i, j] = block.prefab;
-                yield return new WaitForSeconds(0.05f);
+                yield return new WaitForSeconds(spawnTime);
             }
         }
 
