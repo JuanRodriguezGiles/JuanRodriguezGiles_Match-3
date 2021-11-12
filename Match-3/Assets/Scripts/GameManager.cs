@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,7 @@ public class GameManager : MonoBehaviour
     [Range(3, 8)] public int rows;
     [Range(3, 8)] public int columns;
     [Range(2, 10)] public int minMatchNumber;
+    [Range(1, 100)] public int moves;
     public List<BLOCK_TYPES> blockTypes;
 
     [Header("Prefabs")]
@@ -16,7 +18,12 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject blockPrefab;
 
     private GameObject blocks;
-    [SerializeField] public GameObject[,] grid;
+    private GameObject[,] grid;
+    private int score = 0;
+
+    public static event Action<int> OnScoreChange;
+    public static event Action<int> OnMovesChange; 
+
     void OnEnable()
     {
         PlayerInput.OnMouseReleased += ClearBlocks;
@@ -32,6 +39,7 @@ public class GameManager : MonoBehaviour
         CreateGrid();
         CenterCameraOnGrid();
         StartCoroutine(InstantiateBlocks());
+        OnMovesChange?.Invoke(moves);
     }
 
     void CreateGrid()
@@ -103,6 +111,8 @@ public class GameManager : MonoBehaviour
                 block.GetComponent<Animator>().SetTrigger("OnDespawn");
                 Destroy(block.gameObject,1);
             }
+            AddScore(selectedBlocks.Count);
+            UpdateMovesLeft();
             StartCoroutine(RefillGrid());
         }
         else
@@ -113,6 +123,31 @@ public class GameManager : MonoBehaviour
             }
         }
         selectedBlocks.Clear();
+    }
+
+    void ClearCombo(List<GameObject> matchedBlocks)
+    {
+        PlayerInput.allowed = false;
+        foreach (var block in matchedBlocks)
+        {
+            if (!block) continue;
+            block.GetComponent<Animator>().SetTrigger("OnDespawn");
+            Destroy(block.gameObject, 1);
+        }
+        AddScore(matchedBlocks.Count);
+        StartCoroutine(RefillGrid());
+    }
+
+    void AddScore(int blocksDestroyed)
+    {
+        score += blocksDestroyed * 10;
+        OnScoreChange?.Invoke(score);
+    }
+
+    void UpdateMovesLeft()
+    {
+        moves--;
+        OnMovesChange?.Invoke(moves);
     }
 
     IEnumerator RefillGrid()
@@ -165,6 +200,7 @@ public class GameManager : MonoBehaviour
             yield return null;
         }
     }
+
     void CheckMatches(GameObject block)
     {
         List<GameObject> matchedBlocks = new List<GameObject>();
@@ -181,7 +217,7 @@ public class GameManager : MonoBehaviour
             {
                 matchedBlocks.Add(hitUp[i].transform.gameObject);
             }
-            ClearBlocks(matchedBlocks);
+            ClearCombo(matchedBlocks);
             matched = true;
         }
         if (hitDown.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitDown.Length >= minMatchNumber && !matched))
@@ -190,7 +226,7 @@ public class GameManager : MonoBehaviour
             {
                 matchedBlocks.Add(hitDown[i].transform.gameObject);
             }
-            ClearBlocks(matchedBlocks);
+            ClearCombo(matchedBlocks);
             matched = true;
         }
         if (hitLeft.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitLeft.Length >= minMatchNumber && !matched))
@@ -199,7 +235,7 @@ public class GameManager : MonoBehaviour
             {
                 matchedBlocks.Add(hitLeft[i].transform.gameObject);
             }
-            ClearBlocks(matchedBlocks);
+            ClearCombo(matchedBlocks);
             matched = true;
         }
         if (hitRight.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitRight.Length >= minMatchNumber && !matched))
@@ -208,7 +244,7 @@ public class GameManager : MonoBehaviour
             {
                 matchedBlocks.Add(hitRight[i].transform.gameObject);
             }
-            ClearBlocks(matchedBlocks);
+            ClearCombo(matchedBlocks);
             matched = true;
         }
         PlayerInput.allowed = true;
