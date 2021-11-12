@@ -35,6 +35,8 @@ public class GameManager : MonoBehaviour
     public static event Action<int> OnMovesChange;
     public static event Action OnGameOver;
     public static event Action OnClearBlocks;
+    public static event Action OnMatch;
+    public static event Action OnNoMatch;
 
     void OnEnable()
     {
@@ -152,6 +154,7 @@ public class GameManager : MonoBehaviour
     {
         if (selectedBlocks.Count >= minMatchNumber)
         {
+            OnMatch?.Invoke();
             PlayerInput.allowed = false;
             foreach (var block in selectedBlocks)
             {
@@ -159,7 +162,6 @@ public class GameManager : MonoBehaviour
                 block.GetComponent<Animator>().SetTrigger("OnDespawn");
                 Destroy(block.gameObject, 1);
             }
-
             AddScore(selectedBlocks.Count);
             UpdateMovesLeft();
             if (!CheckForGameOver())
@@ -169,6 +171,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
+            OnNoMatch?.Invoke();
             foreach (var block in selectedBlocks)
             {
                 block.GetComponent<SpriteRenderer>().color = Color.white;
@@ -181,6 +184,7 @@ public class GameManager : MonoBehaviour
 
     void ClearCombo(List<GameObject> matchedBlocks)
     {
+        OnMatch?.Invoke();
         PlayerInput.allowed = false;
         foreach (var block in matchedBlocks)
         {
