@@ -4,12 +4,13 @@ public class UiGameplay : MonoBehaviour
 {
     public TMP_Text scoreText;
     public TMP_Text movesLeftText;
-    private TMP_Text versionText;
+    public TMP_Text versionText;
 
     void OnEnable()
     {
         GameManager.OnScoreChange += UpdateScoreText;
         GameManager.OnMovesChange += UpdateMovesLeftText;
+        versionText.text = "v" + Application.version;
     }
 
     void OnDisable()

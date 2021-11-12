@@ -22,7 +22,7 @@ public class GameManager : MonoBehaviour
     private int score = 0;
 
     public static event Action<int> OnScoreChange;
-    public static event Action<int> OnMovesChange; 
+    public static event Action<int> OnMovesChange;
 
     void OnEnable()
     {
@@ -109,7 +109,7 @@ public class GameManager : MonoBehaviour
             {
                 if (!block) continue;
                 block.GetComponent<Animator>().SetTrigger("OnDespawn");
-                Destroy(block.gameObject,1);
+                Destroy(block.gameObject, 1);
             }
             AddScore(selectedBlocks.Count);
             UpdateMovesLeft();
