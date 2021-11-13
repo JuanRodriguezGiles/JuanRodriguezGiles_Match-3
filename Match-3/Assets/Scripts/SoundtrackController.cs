@@ -6,17 +6,13 @@ public class SoundtrackController : MonoBehaviour
     public float percentage;
     void OnEnable()
     {
+        audio = GetComponent<AudioSource>();
         GameManager.OnMovesChange += ChangePitch;
     }
 
     void OnDisable()
     {
         GameManager.OnMovesChange -= ChangePitch;
-    }
-
-    void Start()
-    {
-        audio = GetComponent<AudioSource>();
     }
 
     void ChangePitch(int moves)

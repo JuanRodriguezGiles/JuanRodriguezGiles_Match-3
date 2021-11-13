@@ -86,7 +86,7 @@ public class GameManager : MonoBehaviour
     {
         Camera camera = FindObjectOfType<Camera>();
         float x = (float)rows / 2 - 0.5f;
-        float y = (float)columns / 2 - 0.5f;
+        float y = (float) columns / 2;
         Vector3 position = new Vector3(x, y, -100);
         camera.transform.position = position;
     }
