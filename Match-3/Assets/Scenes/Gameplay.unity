@@ -169,7 +169,7 @@ MonoBehaviour:
   rows: 8
   columns: 7
   minMatchNumber: 3
-  moves: 41
+  moves: 10
   blockTypes: 0000000001000000020000000300000004000000
   spawnType: 3
   spawnTime: 0.0523
@@ -1458,7 +1458,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 500, y: -0.00012207031}
+  m_AnchoredPosition: {x: 500, y: 0}
   m_SizeDelta: {x: 1000, y: 100}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1634225387
