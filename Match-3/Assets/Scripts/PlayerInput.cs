@@ -4,13 +4,16 @@ using System.Linq;
 using UnityEngine;
 public class PlayerInput : MonoBehaviour
 {
+    #region PROPERTIES
     [SerializeField] private LayerMask inputLayer;
     private List<GameObject> selectedBlocks;
     public static event Action<List<GameObject>> OnMouseReleased;
     public static event Action<GameObject> OnBlockSelected;
     public static event Action OnBlockDeselected;
     public static bool allowed;
+    #endregion
 
+    #region METHODS
     void OnEnable()
     {
         GameManager.OnGameOver += DisableInput;
@@ -37,7 +40,7 @@ public class PlayerInput : MonoBehaviour
                 SelectBlock(block.gameObject);
             }
         }
-        else if (selectedBlocks.Count > 0) 
+        else if (selectedBlocks.Count > 0)
         {
             OnMouseReleased?.Invoke(selectedBlocks);
         }
@@ -48,7 +51,7 @@ public class PlayerInput : MonoBehaviour
         if (selectedBlocks.Count == 0) //No active chain
         {
             selectedBlocks.Add(block);
-            block.GetComponent<SpriteRenderer>().color = Color.green; 
+            block.GetComponent<SpriteRenderer>().color = Color.green;
             block.GetComponent<Animator>().SetBool("Selected", true);
             OnBlockSelected?.Invoke(block.gameObject);
         }
@@ -64,7 +67,7 @@ public class PlayerInput : MonoBehaviour
             else if (!AlreadySelected(block))
             {
                 selectedBlocks.Add(block);
-                block.GetComponent<SpriteRenderer>().color = Color.green; 
+                block.GetComponent<SpriteRenderer>().color = Color.green;
                 block.GetComponent<Animator>().SetBool("Selected", true);
                 OnBlockSelected?.Invoke(block.gameObject);
             }
@@ -105,4 +108,5 @@ public class PlayerInput : MonoBehaviour
     {
         allowed = false;
     }
+    #endregion
 }

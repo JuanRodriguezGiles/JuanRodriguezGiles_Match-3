@@ -1,9 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using Random = UnityEngine.Random;
 public enum SPAWN_TYPES
 {
     LEFT_RIGHT_UP,
@@ -13,6 +10,7 @@ public enum SPAWN_TYPES
 }
 public class GameManager : MonoBehaviourSingleton<GameManager>
 {
+    #region PROPERTIES
     [Header("Game Setup")]
     [Range(3, 8)] public int rows;
     [Range(3, 8)] public int columns;
@@ -28,8 +26,9 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
     public static event Action<int> OnScoreChange;
     public static event Action<int> OnMovesChange;
     public static event Action OnGameOver;
+    #endregion
 
-
+    #region METHODS
     void OnEnable()
     {
         UiGameplay.OnPlayButtonPressed += Restart;
@@ -72,4 +71,5 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
         OnGameOver?.Invoke();
         return true;
     }
+    #endregion
 }

@@ -1,10 +1,13 @@
 using UnityEngine;
 public class LineController : MonoBehaviour
 {
+    #region PROPERTIES
     [SerializeField] private float width;
     private LineRenderer line;
     private int count;
+    #endregion
 
+    #region METHODS
     void OnEnable()
     {
         PlayerInput.OnBlockSelected += AddLine;
@@ -49,4 +52,5 @@ public class LineController : MonoBehaviour
         line.positionCount++;
         count = 0;
     }
+    #endregion
 }

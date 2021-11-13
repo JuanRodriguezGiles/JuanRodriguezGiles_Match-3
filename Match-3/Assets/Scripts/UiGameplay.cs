@@ -3,13 +3,15 @@ using TMPro;
 using UnityEngine;
 public class UiGameplay : MonoBehaviour
 {
+    #region PROPERTIES
     public TMP_Text scoreText;
     public TMP_Text movesLeftText;
     public TMP_Text versionText;
     public RectTransform gameOverPanel;
-
     public static event Action OnPlayButtonPressed;
+    #endregion
 
+    #region METHODS
     void OnEnable()
     {
         GameManager.OnScoreChange += UpdateScoreText;
@@ -18,7 +20,6 @@ public class UiGameplay : MonoBehaviour
         versionText.text = "v" + Application.version + " - Juan Rodriguez Giles";
         gameOverPanel.gameObject.SetActive(false);
     }
-
     void OnDisable()
     {
         GameManager.OnScoreChange -= UpdateScoreText;
@@ -45,4 +46,5 @@ public class UiGameplay : MonoBehaviour
         gameOverPanel.gameObject.SetActive(false);
         OnPlayButtonPressed?.Invoke();
     }
+    #endregion
 }

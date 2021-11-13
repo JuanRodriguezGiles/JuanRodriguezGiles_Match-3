@@ -1,12 +1,15 @@
 using UnityEngine;
 public class SfxController : MonoBehaviourSingleton<SfxController>
 {
+    #region PROPERTIES
     [SerializeField] private AudioClip select;
     [SerializeField] private AudioClip deselect;
     [SerializeField] private AudioClip match;
     [SerializeField] private AudioClip noMatch;
     private AudioSource audioSource;
+    #endregion
 
+    #region METHODS
     void OnEnable()
     {
         PlayerInput.OnBlockSelected += PlaySelectSound;
@@ -14,13 +17,13 @@ public class SfxController : MonoBehaviourSingleton<SfxController>
         BoardManager.OnMatch += PlayMatchSound;
         BoardManager.OnNoMatch += PlayNoMatchSound;
     }
+
     void OnDisable()
     {
         PlayerInput.OnBlockSelected -= PlaySelectSound;
         PlayerInput.OnBlockDeselected -= PlayDeselectSound;
         BoardManager.OnMatch -= PlayMatchSound;
         BoardManager.OnNoMatch -= PlayNoMatchSound;
-
     }
 
     void Start()
@@ -51,4 +54,5 @@ public class SfxController : MonoBehaviourSingleton<SfxController>
         audioSource.clip = noMatch;
         audioSource.Play();
     }
+    #endregion
 }

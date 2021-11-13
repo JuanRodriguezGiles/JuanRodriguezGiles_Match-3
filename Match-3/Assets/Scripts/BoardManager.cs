@@ -6,6 +6,7 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 public class BoardManager : MonoBehaviour
 {
+    #region PROPERTIES
     private int rows;
     private int columns;
     private SPAWN_TYPES spawnType;
@@ -21,8 +22,9 @@ public class BoardManager : MonoBehaviour
     public static event Action OnClearBlocks;
     public static event Action OnMatch;
     public static event Action OnNoMatch;
+    #endregion
 
-
+    #region METHODS
     void OnEnable()
     {
         PlayerInput.OnMouseReleased += ClearBlocks;
@@ -269,4 +271,5 @@ public class BoardManager : MonoBehaviour
         }
         PlayerInput.allowed = true;
     }
+    #endregion
 }

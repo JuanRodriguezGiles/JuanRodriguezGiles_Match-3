@@ -1,9 +1,13 @@
 using UnityEngine;
 public class SoundtrackController : MonoBehaviour
 {
+    #region PROPERTIES
     private int maxMoves;
     private AudioSource audioSource;
     public float percentage;
+    #endregion
+
+    #region METHODS
     void OnEnable()
     {
         audioSource = GetComponent<AudioSource>();
@@ -33,4 +37,5 @@ public class SoundtrackController : MonoBehaviour
             audioSource.pitch = 1;
         }
     }
+    #endregion
 }
