@@ -172,27 +172,6 @@ public class BoardManager : MonoBehaviour
                 }
             }
         }
-        //List<Vector2> emptyTilesPos = GetEmptyTiles();
-        //foreach (var position in emptyTilesPos)
-        //{
-        //    Block block = new Block();
-        //    block.prefab = BlockObjectPool.Get().Pool.Get();
-        //    block.prefab.transform.position = position;
-        //    block.prefab.transform.rotation = Quaternion.identity;
-        //    block.prefab.name = "Block";
-        //    block.SetBlockType(Random.Range(0, blockTypes.Count));
-        //}
-        //for (int i = 0; i < rows; i++)
-        //{
-        //    for (int j = 0; j < columns; j++)
-        //    {
-        //        Collider2D block = Physics2D.OverlapPoint(new Vector2(j, i));
-        //        if (block)
-        //        {
-        //            CheckMatches(block.gameObject);
-        //        }
-        //    }
-        //}
     }
 
     void ClearCombo(List<GameObject> matchedBlocks)
@@ -263,47 +242,104 @@ public class BoardManager : MonoBehaviour
         List<GameObject> matchedBlocks = new List<GameObject>();
         bool matched = false;
         Vector2 pos = new Vector2(block.transform.position.x, block.transform.position.y);
-        RaycastHit2D[] hitUp = Physics2D.RaycastAll(pos, Vector2.up, minMatchNumber - 1);
-        RaycastHit2D[] hitDown = Physics2D.RaycastAll(pos, Vector2.down, minMatchNumber - 1);
-        RaycastHit2D[] hitLeft = Physics2D.RaycastAll(pos, Vector2.left, minMatchNumber - 1);
-        RaycastHit2D[] hitRight = Physics2D.RaycastAll(pos, Vector2.right, minMatchNumber - 1);
 
-        if (hitUp.All(blocks => blocks.transform.gameObject.CompareTag(block.tag) && hitUp.Length >= minMatchNumber))
+        //RaycastHit2D[] hitUp = Physics2D.RaycastAll(pos, Vector2.up, minMatchNumber - 1);
+        //RaycastHit2D[] hitDown = Physics2D.RaycastAll(pos, Vector2.down, minMatchNumber - 1);
+        //RaycastHit2D[] hitLeft = Physics2D.RaycastAll(pos, Vector2.left, minMatchNumber - 1);
+        //RaycastHit2D[] hitRight = Physics2D.RaycastAll(pos, Vector2.right, minMatchNumber - 1);
+
+        //if (hitUp.All(blocks => blocks.transform.gameObject.CompareTag(block.tag) && hitUp.Length >= minMatchNumber))
+        //{
+        //    for (int i = 0; i < hitUp.Length; i++)
+        //    {
+        //        matchedBlocks.Add(hitUp[i].transform.gameObject);
+        //    }
+        //    ClearCombo(matchedBlocks);
+        //    matched = true;
+        //}
+        //if (hitDown.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitDown.Length >= minMatchNumber && !matched))
+        //{
+        //    for (int i = 0; i < hitDown.Length; i++)
+        //    {
+        //        matchedBlocks.Add(hitDown[i].transform.gameObject);
+        //    }
+        //    ClearCombo(matchedBlocks);
+        //    matched = true;
+        //}
+        //if (hitLeft.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitLeft.Length >= minMatchNumber && !matched))
+        //{
+        //    for (int i = 0; i < hitLeft.Length; i++)
+        //    {
+        //        matchedBlocks.Add(hitLeft[i].transform.gameObject);
+        //    }
+        //    ClearCombo(matchedBlocks);
+        //    matched = true;
+        //}
+        //if (hitRight.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitRight.Length >= minMatchNumber && !matched))
+        //{
+        //    for (int i = 0; i < hitRight.Length; i++)
+        //    {
+        //        matchedBlocks.Add(hitRight[i].transform.gameObject);
+        //    }
+        //    ClearCombo(matchedBlocks);
+        //    matched = true;
+        //}
+
+        //PlayerInput.allowed = true;
+
+        //Up
+        for (int i = 0; i < minMatchNumber; i++)
         {
-            for (int i = 0; i < hitUp.Length; i++)
-            {
-                matchedBlocks.Add(hitUp[i].transform.gameObject);
-            }
+            if (pos.y + minMatchNumber - 1 >= rows)
+                break;
+            matchedBlocks.Add(_grid[(int)pos.y + i, (int)pos.x].prefab);
+        }
+        if (matchedBlocks.All(_blocks => _blocks.CompareTag(block.tag)) && matchedBlocks.Count >= minMatchNumber &&
+            !matched)
+        {
             ClearCombo(matchedBlocks);
             matched = true;
         }
-        if (hitDown.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitDown.Length >= minMatchNumber && !matched))
+        //Down
+        for (int i = 0; i < minMatchNumber; i++)
         {
-            for (int i = 0; i < hitDown.Length; i++)
-            {
-                matchedBlocks.Add(hitDown[i].transform.gameObject);
-            }
+            if (pos.y - minMatchNumber - 1 <= 0)
+                break;
+            matchedBlocks.Add(_grid[(int)pos.y - i, (int)pos.x].prefab);
+        }
+        if (matchedBlocks.All(_blocks => _blocks.CompareTag(block.tag)) && matchedBlocks.Count >= minMatchNumber &&
+            !matched)
+        {
             ClearCombo(matchedBlocks);
             matched = true;
         }
-        if (hitLeft.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitLeft.Length >= minMatchNumber && !matched))
+        //Left
+        for (int i = 0; i < minMatchNumber; i++)
         {
-            for (int i = 0; i < hitLeft.Length; i++)
-            {
-                matchedBlocks.Add(hitLeft[i].transform.gameObject);
-            }
+            if (pos.x - minMatchNumber - 1 <= 0)
+                break;
+            matchedBlocks.Add(_grid[(int)pos.y, (int)pos.x - i].prefab);
+        }
+        if (matchedBlocks.All(_blocks => _blocks.CompareTag(block.tag)) && matchedBlocks.Count >= minMatchNumber &&
+            !matched)
+        {
             ClearCombo(matchedBlocks);
             matched = true;
         }
-        if (hitRight.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitRight.Length >= minMatchNumber && !matched))
+        //Right
+        for (int i = 0; i < minMatchNumber; i++)
         {
-            for (int i = 0; i < hitRight.Length; i++)
-            {
-                matchedBlocks.Add(hitRight[i].transform.gameObject);
-            }
+            if (pos.x + minMatchNumber - 1 >= columns)
+                break;
+            matchedBlocks.Add(_grid[(int)pos.y, (int)pos.x + i].prefab);
+        }
+        if (matchedBlocks.All(_blocks => _blocks.CompareTag(block.tag)) && matchedBlocks.Count >= minMatchNumber &&
+            !matched)
+        {
             ClearCombo(matchedBlocks);
             matched = true;
         }
+
         PlayerInput.allowed = true;
     }
     #endregion
