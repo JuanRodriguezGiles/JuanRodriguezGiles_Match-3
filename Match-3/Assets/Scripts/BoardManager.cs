@@ -90,7 +90,10 @@ public class BoardManager : MonoBehaviour
             {
                 for (int j = 0; j < columns; j++)
                 {
-                    BlockObjectPool.Get().Pool.Release(_grid[i, j].prefab);
+                    if (_grid[i, j].active)
+                    {
+                        BlockObjectPool.Get().Pool.Release(_grid[i, j].prefab);
+                    }
                 }
             }
         }
@@ -164,7 +167,7 @@ public class BoardManager : MonoBehaviour
             {
                 if (_grid[i, j].active)
                 {
-                   CheckMatches(_grid[i, j].prefab);
+                    CheckMatches(_grid[i, j].prefab);
                 }
             }
         }
@@ -283,61 +286,6 @@ public class BoardManager : MonoBehaviour
                 matched = true;
             }
         }
-        {
-            ////Up
-            //for (int i = 0; i < minMatchNumber; i++)
-            //{
-            //    if (pos.y + minMatchNumber - 1 >= rows)
-            //        break;
-            //    matchedBlocks.Add(_grid[(int)pos.y + i, (int)pos.x].prefab);
-            //}
-            //if (matchedBlocks.All(_blocks => _blocks.CompareTag(block.tag)) && matchedBlocks.Count >= minMatchNumber &&
-            //    !matched)
-            //{
-            //    ClearCombo(matchedBlocks);
-            //    matched = true;
-            //}
-            ////Down
-            //for (int i = 0; i < minMatchNumber; i++)
-            //{
-            //    if (pos.y - minMatchNumber - 1 <= 0)
-            //        break;
-            //    matchedBlocks.Add(_grid[(int)pos.y - i, (int)pos.x].prefab);
-            //}
-            //if (matchedBlocks.All(_blocks => _blocks.CompareTag(block.tag)) && matchedBlocks.Count >= minMatchNumber &&
-            //    !matched)
-            //{
-            //    matched = true;
-            //    ClearCombo(matchedBlocks);
-            //}
-            ////Left
-            //for (int i = 0; i < minMatchNumber; i++)
-            //{
-            //    if (pos.x - minMatchNumber - 1 <= 0)
-            //        break;
-            //    matchedBlocks.Add(_grid[(int)pos.y, (int)pos.x - i].prefab);
-            //}
-            //if (matchedBlocks.All(_blocks => _blocks.CompareTag(block.tag)) && matchedBlocks.Count >= minMatchNumber &&
-            //    !matched)
-            //{
-            //    matched = true;
-            //    ClearCombo(matchedBlocks);
-            //}
-            ////Right
-            //for (int i = 0; i < minMatchNumber; i++)
-            //{
-            //    if (pos.x + minMatchNumber - 1 >= columns)
-            //        break;
-            //    matchedBlocks.Add(_grid[(int)pos.y, (int)pos.x + i].prefab);
-            //}
-            //if (matchedBlocks.All(_blocks => _blocks.CompareTag(block.tag)) && matchedBlocks.Count >= minMatchNumber &&
-            //    !matched)
-            //{
-            //    matched = true;
-            //    ClearCombo(matchedBlocks);
-            //}
-        }
-        //PlayerInput.allowed = true;
     }
     #endregion
 }
