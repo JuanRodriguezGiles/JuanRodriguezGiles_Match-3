@@ -1,6 +1,4 @@
-using System;
 using UnityEngine;
-[Serializable]
 public enum BLOCK_TYPES
 {
     AIR,
@@ -15,7 +13,6 @@ public enum BLOCK_TYPES
     SPIRIT,
     WATER
 };
-[Serializable]
 public class Block
 {
     public BLOCK_TYPES type;
