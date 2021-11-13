@@ -2,11 +2,11 @@ using UnityEngine;
 public class SoundtrackController : MonoBehaviour
 {
     private int maxMoves;
-    private AudioSource audio;
+    private AudioSource audioSource;
     public float percentage;
     void OnEnable()
     {
-        audio = GetComponent<AudioSource>();
+        audioSource = GetComponent<AudioSource>();
         GameManager.OnMovesChange += ChangePitch;
     }
 
@@ -22,15 +22,15 @@ public class SoundtrackController : MonoBehaviour
         percentage = ((float)moves / (float)maxMoves) * 100;
         if (moves == 0)
         {
-            audio.pitch = 1;
+            audioSource.pitch = 1;
         }
         else if (percentage <= 25 || moves == 1)
         {
-            audio.pitch = 1.25f;
+            audioSource.pitch = 1.25f;
         }
         else
         {
-            audio.pitch = 1;
+            audioSource.pitch = 1;
         }
     }
 }

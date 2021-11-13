@@ -9,14 +9,14 @@ public class LineController : MonoBehaviour
     {
         PlayerInput.OnBlockSelected += AddLine;
         PlayerInput.OnBlockDeselected += RemoveLine;
-        GameManager.OnClearBlocks += ClearLine;
+        BoardManager.OnClearBlocks += ClearLine;
     }
 
     void OnDisable()
     {
         PlayerInput.OnBlockSelected -= AddLine;
         PlayerInput.OnBlockDeselected -= RemoveLine;
-        GameManager.OnClearBlocks -= ClearLine;
+        BoardManager.OnClearBlocks -= ClearLine;
     }
 
     void Start()
