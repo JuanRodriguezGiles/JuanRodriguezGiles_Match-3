@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+[Serializable]
 public enum BLOCK_TYPES
 {
     AIR,
@@ -13,9 +15,13 @@ public enum BLOCK_TYPES
     SPIRIT,
     WATER
 };
+[Serializable]
 public class Block
 {
     public BLOCK_TYPES type;
+    public bool active = true;
+    public int row;
+    public int column;
     public GameObject prefab;
     public void SetBlockType(int typeIndex)
     {

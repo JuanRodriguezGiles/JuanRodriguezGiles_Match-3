@@ -12,12 +12,11 @@ public class BoardManager : MonoBehaviour
     private SPAWN_TYPES spawnType;
     private List<BLOCK_TYPES> blockTypes;
     private float spawnTime;
-    private GameObject blocks;
     private int minMatchNumber;
+    public Block[,] _grid;
 
     [Header("Prefabs")]
     [SerializeField] private GameObject tilePrefab;
-    [SerializeField] private GameObject blockPrefab;
 
     public static event Action OnClearBlocks;
     public static event Action OnMatch;
@@ -53,6 +52,7 @@ public class BoardManager : MonoBehaviour
 
     void CreateGrid()
     {
+        _grid = new Block[rows, columns];
         GameObject grid = new GameObject("Grid");
         for (int i = 0; i < rows; i++)
         {
@@ -83,7 +83,6 @@ public class BoardManager : MonoBehaviour
     {
         BLOCK_TYPES[] previousLeft = new BLOCK_TYPES[rows];
         BLOCK_TYPES previousDown = BLOCK_TYPES.AIR;
-        blocks = new GameObject("Blocks"); //Parent go for blocks
 
         if (restart)
         {
@@ -91,11 +90,12 @@ public class BoardManager : MonoBehaviour
             {
                 for (int j = 0; j < columns; j++)
                 {
-                    Collider2D oldBlock = Physics2D.OverlapPoint(new Vector2(j, i)); //TODO use object pooling?
-                    if (oldBlock)
-                    {
-                        Destroy(oldBlock.gameObject);
-                    }
+                    //Collider2D oldBlock = Physics2D.OverlapPoint(new Vector2(j, i)); //TODO use object pooling?
+                    //if (oldBlock)
+                    //{
+                    //    BlockObjectPool.Get().Pool.Release(oldBlock.gameObject);
+                    //}
+                    BlockObjectPool.Get().Pool.Release(_grid[i, j].prefab);
                 }
             }
         }
@@ -114,8 +114,15 @@ public class BoardManager : MonoBehaviour
                 };
 
                 Block block = new Block();
-                block.prefab = Instantiate(blockPrefab, position, Quaternion.identity, blocks.transform);
+                block.prefab = BlockObjectPool.Get().Pool.Get();
+                block.prefab.transform.position = position;
+                block.prefab.transform.rotation = Quaternion.identity;
                 block.prefab.name = "Block";
+                block.active = true;
+
+                _grid[(int)position.y, (int)position.x] = block;
+                _grid[(int)position.y, (int)position.x].column = (int)position.x;
+                _grid[(int)position.y, (int)position.x].row = (int)position.y;
 
                 List<BLOCK_TYPES> possibleBlocks = new List<BLOCK_TYPES>();
                 possibleBlocks.AddRange(blockTypes);
@@ -139,25 +146,53 @@ public class BoardManager : MonoBehaviour
     IEnumerator RefillGrid()
     {
         yield return new WaitForSeconds(1);
-        List<Vector2> emptyTilesPos = GetEmptyTiles();
-        foreach (var position in emptyTilesPos)
-        {
-            Block block = new Block();
-            block.prefab = Instantiate(blockPrefab, position, Quaternion.identity, blocks.transform);
-            block.prefab.name = "Block";
-            block.SetBlockType(Random.Range(0, blockTypes.Count));
-        }
         for (int i = 0; i < rows; i++)
         {
             for (int j = 0; j < columns; j++)
             {
-                Collider2D block = Physics2D.OverlapPoint(new Vector2(j, i));
-                if (block)
+                if (!_grid[i, j].active)
                 {
-                    CheckMatches(block.gameObject);
+                    _grid[i, j].prefab = BlockObjectPool.Get().Pool.Get();
+                    _grid[i, j].prefab.transform.position = new Vector3(_grid[i, j].column, _grid[i, j].row, 0);
+                    _grid[i, j].prefab.transform.rotation = Quaternion.identity;
+                    _grid[i, j].prefab.name = "Block";
+                    _grid[i, j].SetBlockType(Random.Range(0, blockTypes.Count));
+                    _grid[i, j].active = true;
                 }
             }
         }
+        yield return new WaitForSeconds(0.2f);
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < columns; j++)
+            {
+                if (_grid[i, j].active)
+                {
+                    CheckMatches(_grid[i, j].prefab);
+                }
+            }
+        }
+        //List<Vector2> emptyTilesPos = GetEmptyTiles();
+        //foreach (var position in emptyTilesPos)
+        //{
+        //    Block block = new Block();
+        //    block.prefab = BlockObjectPool.Get().Pool.Get();
+        //    block.prefab.transform.position = position;
+        //    block.prefab.transform.rotation = Quaternion.identity;
+        //    block.prefab.name = "Block";
+        //    block.SetBlockType(Random.Range(0, blockTypes.Count));
+        //}
+        //for (int i = 0; i < rows; i++)
+        //{
+        //    for (int j = 0; j < columns; j++)
+        //    {
+        //        Collider2D block = Physics2D.OverlapPoint(new Vector2(j, i));
+        //        if (block)
+        //        {
+        //            CheckMatches(block.gameObject);
+        //        }
+        //    }
+        //}
     }
 
     void ClearCombo(List<GameObject> matchedBlocks)
@@ -167,8 +202,8 @@ public class BoardManager : MonoBehaviour
         foreach (var block in matchedBlocks)
         {
             if (!block) continue;
+            _grid[(int)block.transform.position.y, (int)block.transform.position.x].active = false;
             block.GetComponent<Animator>().SetTrigger("OnDespawn");
-            Destroy(block.gameObject, 1);
         }
         GameManager.Get().AddScore(matchedBlocks.Count);
         StartCoroutine(RefillGrid());
@@ -200,8 +235,8 @@ public class BoardManager : MonoBehaviour
             foreach (var block in selectedBlocks)
             {
                 if (!block) continue;
+                _grid[(int)block.transform.position.y, (int)block.transform.position.x].active = false;
                 block.GetComponent<Animator>().SetTrigger("OnDespawn");
-                Destroy(block.gameObject, 1);
             }
             GameManager.Get().AddScore(selectedBlocks.Count);
             GameManager.Get().UpdateMovesLeft();
@@ -233,7 +268,7 @@ public class BoardManager : MonoBehaviour
         RaycastHit2D[] hitLeft = Physics2D.RaycastAll(pos, Vector2.left, minMatchNumber - 1);
         RaycastHit2D[] hitRight = Physics2D.RaycastAll(pos, Vector2.right, minMatchNumber - 1);
 
-        if (hitUp.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitUp.Length >= minMatchNumber))
+        if (hitUp.All(blocks => blocks.transform.gameObject.CompareTag(block.tag) && hitUp.Length >= minMatchNumber))
         {
             for (int i = 0; i < hitUp.Length; i++)
             {
