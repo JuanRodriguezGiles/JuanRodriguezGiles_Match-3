@@ -153,18 +153,18 @@ public class BoardManager : MonoBehaviour
         }
         for (int j = 0; j < columns; j++)
         {
+            int emptyCount = 0;
             for (int i = 0; i < rows; i++)
             {
-                if (!_grid[i, j].active)
-                {
-                    _grid[i, j].prefab = BlockObjectPool.Get().Pool.Get();
-                    _grid[i, j].prefab.transform.position = new Vector3(_grid[i, j].column, rows + 1, 0);
-                    _grid[i, j].prefab.transform.rotation = Quaternion.identity;
-                    _grid[i, j].prefab.name = "Block";
-                    _grid[i, j].SetBlockType(Random.Range(0, blockTypes.Count));
-                    _grid[i, j].active = true;
-                    StartCoroutine(DropBlock(_grid[i, j].prefab, rows + 1, i));
-                }
+                if (_grid[i, j].active) continue;
+                emptyCount++;
+                _grid[i, j].prefab = BlockObjectPool.Get().Pool.Get();
+                _grid[i, j].prefab.transform.position = new Vector3(_grid[i, j].column, rows + emptyCount, 0);
+                _grid[i, j].prefab.transform.rotation = Quaternion.identity;
+                _grid[i, j].prefab.name = "Block";
+                _grid[i, j].SetBlockType(Random.Range(0, blockTypes.Count));
+                _grid[i, j].active = true;
+                StartCoroutine(DropBlock(_grid[i, j].prefab, rows + emptyCount, i));
             }
         }
         while (moving)
