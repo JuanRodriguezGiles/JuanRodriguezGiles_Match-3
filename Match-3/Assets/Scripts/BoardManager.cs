@@ -149,7 +149,7 @@ public class BoardManager : MonoBehaviour
         PlayerInput.allowed = false;
         while (moving)
         {
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(0.75f);
         }
         for (int j = 0; j < columns; j++)
         {
@@ -169,7 +169,7 @@ public class BoardManager : MonoBehaviour
         }
         while (moving)
         {
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(0.75f);
         }
         for (int i = 0; i < rows; i++)
         {
@@ -183,6 +183,7 @@ public class BoardManager : MonoBehaviour
         }
         yield return new WaitForSeconds(0.2f);
         PlayerInput.allowed = true;
+        GameManager.Get().CheckForGameOver();
     }
 
     void ClearCombo(List<GameObject> matchedBlocks)
@@ -235,7 +236,6 @@ public class BoardManager : MonoBehaviour
             }
             GameManager.Get().AddScore(selectedBlocks.Count);
             GameManager.Get().UpdateMovesLeft();
-            GameManager.Get().CheckForGameOver();
         }
         else
         {
@@ -333,16 +333,15 @@ public class BoardManager : MonoBehaviour
     IEnumerator DropBlock(GameObject block, float startY, float targetY)
     {
         moving = true;
-        float speed = 4f;
+        float speed = 6f;
         block.transform.position = new Vector3(block.transform.position.x, startY, 0);
         while (block.transform.position.y > targetY)
         {
             block.transform.position -= speed * Time.deltaTime * new Vector3(0, 1, 0);
-            yield return null;
+            yield return new WaitForEndOfFrame();
         }
         block.transform.position = new Vector3(block.transform.position.x, targetY, block.transform.position.z);
         moving = false;
     }
-
     #endregion
 }

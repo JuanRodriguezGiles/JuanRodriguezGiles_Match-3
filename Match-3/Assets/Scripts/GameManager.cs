@@ -67,8 +67,11 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
 
     public void CheckForGameOver()
     {
-        if (movesLeft != 0 && !PlayerInput.allowed) return;
-        OnGameOver?.Invoke();
+        if (movesLeft == 0 && PlayerInput.allowed)
+        {
+
+            OnGameOver?.Invoke();
+        }
     }
     #endregion
 }
