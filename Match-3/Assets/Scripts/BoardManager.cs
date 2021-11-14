@@ -13,6 +13,7 @@ public class BoardManager : MonoBehaviour
     private List<BLOCK_TYPES> blockTypes;
     private float spawnTime;
     private int minMatchNumber;
+    private bool moving = false;
     public Block[,] _grid;
 
     [Header("Prefabs")]
@@ -28,12 +29,14 @@ public class BoardManager : MonoBehaviour
     {
         PlayerInput.OnMouseReleased += ClearBlocks;
         UiGameplay.OnPlayButtonPressed += RestartGrid;
+        ReleaseBlock.OnDespawnAnimationDone += MoveGrid;
     }
 
     void OnDisable()
     {
         PlayerInput.OnMouseReleased -= ClearBlocks;
         UiGameplay.OnPlayButtonPressed -= RestartGrid;
+        ReleaseBlock.OnDespawnAnimationDone -= MoveGrid;
     }
 
     void Start()
@@ -73,8 +76,8 @@ public class BoardManager : MonoBehaviour
     void CenterCameraOnGrid()
     {
         Camera camera = FindObjectOfType<Camera>();
-        float x = (float)rows / 2 - 0.5f;
-        float y = (float)columns / 2;
+        int x = columns / 2;
+        int y = rows / 2;
         Vector3 position = new Vector3(x, y, -100);
         camera.transform.position = position;
     }
@@ -144,23 +147,30 @@ public class BoardManager : MonoBehaviour
     IEnumerator RefillGrid()
     {
         PlayerInput.allowed = false;
-        yield return new WaitForSeconds(1);
-        for (int i = 0; i < rows; i++)
+        while (moving)
         {
-            for (int j = 0; j < columns; j++)
+            yield return new WaitForSeconds(1);
+        }
+        for (int j = 0; j < columns; j++)
+        {
+            for (int i = 0; i < rows; i++)
             {
                 if (!_grid[i, j].active)
                 {
                     _grid[i, j].prefab = BlockObjectPool.Get().Pool.Get();
-                    _grid[i, j].prefab.transform.position = new Vector3(_grid[i, j].column, _grid[i, j].row, 0);
+                    _grid[i, j].prefab.transform.position = new Vector3(_grid[i, j].column, rows + 1, 0);
                     _grid[i, j].prefab.transform.rotation = Quaternion.identity;
                     _grid[i, j].prefab.name = "Block";
                     _grid[i, j].SetBlockType(Random.Range(0, blockTypes.Count));
                     _grid[i, j].active = true;
+                    StartCoroutine(DropBlock(_grid[i, j].prefab, rows + 1, i));
                 }
             }
         }
-        yield return new WaitForSeconds(0.2f);
+        while (moving)
+        {
+            yield return new WaitForSeconds(1);
+        }
         for (int i = 0; i < rows; i++)
         {
             for (int j = 0; j < columns; j++)
@@ -186,7 +196,6 @@ public class BoardManager : MonoBehaviour
             block.GetComponent<Animator>().SetTrigger("OnDespawn");
         }
         GameManager.Get().AddScore(matchedBlocks.Count);
-        StartCoroutine(RefillGrid());
     }
 
     List<Vector2> GetEmptyTiles()
@@ -206,6 +215,12 @@ public class BoardManager : MonoBehaviour
         return tiles;
     }
 
+    void MoveGrid()
+    {
+        MoveGridDown();
+        StartCoroutine(RefillGrid());
+    }
+
     void ClearBlocks(List<GameObject> selectedBlocks)
     {
         if (selectedBlocks.Count >= minMatchNumber)
@@ -220,10 +235,7 @@ public class BoardManager : MonoBehaviour
             }
             GameManager.Get().AddScore(selectedBlocks.Count);
             GameManager.Get().UpdateMovesLeft();
-            if (!GameManager.Get().CheckForGameOver())
-            {
-                StartCoroutine(RefillGrid());
-            }
+            GameManager.Get().CheckForGameOver();
         }
         else
         {
@@ -287,5 +299,50 @@ public class BoardManager : MonoBehaviour
             }
         }
     }
+
+    void MoveGridDown()
+    {
+        int tileCounter = 1;
+
+        for (int j = 0; j < columns; j++)
+        {
+            for (int i = 0; i < rows; i++)
+            {
+                if (i + tileCounter < rows && !_grid[i, j].active)
+                {
+                    while (i + tileCounter < rows - 1 && !_grid[i + tileCounter, j].active)
+                    {
+                        tileCounter++;
+                    }
+
+                    Block aux = _grid[i, j];
+                    _grid[i, j] = _grid[i + tileCounter, j];
+                    _grid[i, j].row = i;
+
+                    _grid[i + tileCounter, j] = aux;
+                    _grid[i + tileCounter, j].row = i + tileCounter;
+                    _grid[i + tileCounter, j].active = false;
+
+                    StartCoroutine(DropBlock(_grid[i, j].prefab, i + tileCounter, i));
+                }
+                tileCounter = 1;
+            }
+        }
+    }
+
+    IEnumerator DropBlock(GameObject block, float startY, float targetY)
+    {
+        moving = true;
+        float speed = 4f;
+        block.transform.position = new Vector3(block.transform.position.x, startY, 0);
+        while (block.transform.position.y > targetY)
+        {
+            block.transform.position -= speed * Time.deltaTime * new Vector3(0, 1, 0);
+            yield return null;
+        }
+        block.transform.position = new Vector3(block.transform.position.x, targetY, block.transform.position.z);
+        moving = false;
+    }
+
     #endregion
 }

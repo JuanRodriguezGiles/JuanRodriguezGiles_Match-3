@@ -12,8 +12,8 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
 {
     #region PROPERTIES
     [Header("Game Setup")]
-    [Range(3, 8)] public int rows;
-    [Range(3, 8)] public int columns;
+    [Range(6, 8)] public int rows;
+    [Range(4, 6)] public int columns;
     [Range(2, 10)] public int minMatchNumber;
     [Range(1, 100)] [SerializeField] private int moves;
     public List<BLOCK_TYPES> blockTypes;
@@ -65,11 +65,10 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
         OnMovesChange?.Invoke(movesLeft);
     }
 
-    public bool CheckForGameOver()
+    public void CheckForGameOver()
     {
-        if (movesLeft != 0) return false;
+        if (movesLeft != 0 && !PlayerInput.allowed) return;
         OnGameOver?.Invoke();
-        return true;
     }
     #endregion
 }

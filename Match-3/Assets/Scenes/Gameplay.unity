@@ -167,11 +167,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rows: 8
-  columns: 7
+  columns: 5
   minMatchNumber: 3
   moves: 10
   blockTypes: 0000000001000000020000000300000004000000
-  spawnType: 3
+  spawnType: 0
   spawnTime: 0.0523
 --- !u!1 &119080719
 GameObject:
@@ -790,10 +790,10 @@ RectTransform:
   m_Father: {fileID: 589612533}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.000015258789, y: 0.0000076293945}
-  m_SizeDelta: {x: 900.03, y: 768.5}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: 0.000015258789, y: 5.049988}
+  m_SizeDelta: {x: 900.03, y: -434.09}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &885747330
 MonoBehaviour:
@@ -1271,7 +1271,7 @@ MonoBehaviour:
   m_fontSize: 36
   m_fontSizeBase: 36
   m_fontWeight: 400
-  m_enableAutoSizing: 1
+  m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
