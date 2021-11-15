@@ -6,7 +6,7 @@ public class BlockObjectPool : MonoBehaviourSingleton<BlockObjectPool>
     #region PROPERTIES
     [SerializeField] private GameObject blockPrefab;
     private bool collectionChecks = true;
-    public int poolSize;
+    private int poolSize;
     private IObjectPool<GameObject> m_Pool;
 
     public IObjectPool<GameObject> Pool

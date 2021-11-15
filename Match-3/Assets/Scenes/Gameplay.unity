@@ -456,7 +456,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockPrefab: {fileID: 7469547034532225541, guid: 763ea70dfa31d1647bebfdeb654fce7a, type: 3}
-  poolSize: 0
 --- !u!1 &589612532
 GameObject:
   m_ObjectHideFlags: 0
@@ -792,7 +791,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0.000015258789, y: 5.049988}
+  m_AnchoredPosition: {x: 0.000015258789, y: 5.050049}
   m_SizeDelta: {x: 900.03, y: -434.09}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &885747330
