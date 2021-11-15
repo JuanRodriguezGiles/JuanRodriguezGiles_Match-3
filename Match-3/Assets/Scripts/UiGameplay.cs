@@ -17,6 +17,7 @@ public class UiGameplay : MonoBehaviour
         GameManager.OnScoreChange += UpdateScoreText;
         GameManager.OnMovesChange += UpdateMovesLeftText;
         GameManager.OnGameOver += OnGameOver;
+
         versionText.text = "v" + Application.version + " - Juan Rodriguez Giles";
         gameOverPanel.gameObject.SetActive(false);
     }

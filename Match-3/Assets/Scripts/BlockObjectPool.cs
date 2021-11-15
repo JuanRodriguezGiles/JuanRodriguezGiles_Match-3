@@ -1,26 +1,25 @@
 using UnityEngine;
 using UnityEngine.Pool;
-
 public class BlockObjectPool : MonoBehaviourSingleton<BlockObjectPool>
 {
     #region PROPERTIES
     [SerializeField] private GameObject blockPrefab;
     private bool collectionChecks = true;
     private int poolSize;
-    private IObjectPool<GameObject> m_Pool;
+    private IObjectPool<GameObject> pool;
 
     public IObjectPool<GameObject> Pool
     {
         get
         {
-            if (m_Pool == null)
+            if (pool == null)
             {
-                poolSize = GameManager.Get().rows * GameManager.Get().columns;
+                poolSize = GameManager.Get().gameData.rows * GameManager.Get().gameData.columns;
 
-                m_Pool = new ObjectPool<GameObject>(CreatePooledItem, OnTakeFromPool, OnReturnedToPool,
+                pool = new ObjectPool<GameObject>(CreatePooledItem, OnTakeFromPool, OnReturnedToPool,
                     OnDestroyPoolObject, collectionChecks, poolSize, poolSize);
             }
-            return m_Pool;
+            return pool;
         }
     }
     #endregion

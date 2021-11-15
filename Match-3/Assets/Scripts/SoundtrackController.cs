@@ -4,7 +4,7 @@ public class SoundtrackController : MonoBehaviour
     #region PROPERTIES
     private int maxMoves;
     private AudioSource audioSource;
-    public float percentage;
+    private float percentage;
     #endregion
 
     #region METHODS
@@ -23,7 +23,7 @@ public class SoundtrackController : MonoBehaviour
     {
         maxMoves = maxMoves == 0 ? moves : maxMoves;
 
-        percentage = ((float)moves / (float)maxMoves) * 100;
+        percentage = (moves / maxMoves) * 100;
         if (moves == 0)
         {
             audioSource.pitch = 1;

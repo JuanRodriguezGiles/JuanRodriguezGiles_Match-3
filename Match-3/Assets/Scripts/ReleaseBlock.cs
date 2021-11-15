@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 public class ReleaseBlock : StateMachineBehaviour
 {
-    private static bool called = false;
+    private static bool called;
     public static Action OnDespawnAnimationDone;
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
@@ -13,7 +13,7 @@ public class ReleaseBlock : StateMachineBehaviour
     {
         GameObject block = animator.gameObject;
         BlockObjectPool.Get().Pool.Release(block);
-        if (called != false) return;
+        if (called) return;
         called = true;
         OnDespawnAnimationDone?.Invoke();
     }

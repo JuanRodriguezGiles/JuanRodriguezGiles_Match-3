@@ -37,7 +37,7 @@ public class PlayerInput : MonoBehaviour
             Collider2D block = Physics2D.OverlapPoint(mousePosition, inputLayer);
             if (block)
             {
-                SelectBlock(block.gameObject);
+                TrySelectBlock(block.gameObject);
             }
         }
         else if (selectedBlocks.Count > 0)
@@ -46,7 +46,7 @@ public class PlayerInput : MonoBehaviour
         }
     }
 
-    void SelectBlock(GameObject block)
+    void TrySelectBlock(GameObject block)
     {
         if (selectedBlocks.Count == 0) //No active chain
         {
@@ -100,10 +100,6 @@ public class PlayerInput : MonoBehaviour
         return block.GetComponent<SpriteRenderer>().color == Color.green; //TODO check with "selected" boolean?
     }
 
-    void EnableInput()
-    {
-        allowed = true;
-    }
     void DisableInput()
     {
         allowed = false;

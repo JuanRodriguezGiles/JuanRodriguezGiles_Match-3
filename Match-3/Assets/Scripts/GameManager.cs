@@ -8,17 +8,21 @@ public enum SPAWN_TYPES
     LEFT_RIGHT_DOWN,
     RIGHT_LEFT_DOWN
 }
-public class GameManager : MonoBehaviourSingleton<GameManager>
+[Serializable]
+public struct GameData
 {
-    #region PROPERTIES
-    [Header("Game Setup")]
     [Range(6, 8)] public int rows;
     [Range(4, 6)] public int columns;
-    [Range(2, 10)] public int minMatchNumber;
-    [Range(1, 100)] [SerializeField] private int moves;
+    [Range(2, 10)] public int minimumMatchNumber;
+    [Range(1, 100)] public int moves;
     public List<BLOCK_TYPES> blockTypes;
     public SPAWN_TYPES spawnType;
     [Range(0.01f, 0.1f)] public float spawnTime;
+}
+public class GameManager : MonoBehaviourSingleton<GameManager>
+{
+    #region PROPERTIES
+    public GameData gameData;
 
     private int score;
     private int movesLeft;
@@ -41,15 +45,15 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
 
     void Start()
     {
-        movesLeft = moves;
-        OnMovesChange?.Invoke(moves);
+        movesLeft = gameData.moves;
+        OnMovesChange?.Invoke(movesLeft);
     }
 
     void Restart()
     {
         score = 0;
         OnScoreChange?.Invoke(0);
-        movesLeft = moves;
+        movesLeft = gameData.moves;
         OnMovesChange?.Invoke(movesLeft);
     }
 
@@ -69,7 +73,6 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
     {
         if (movesLeft == 0 && PlayerInput.allowed)
         {
-
             OnGameOver?.Invoke();
         }
     }

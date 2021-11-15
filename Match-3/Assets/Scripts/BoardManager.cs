@@ -7,14 +7,9 @@ using Random = UnityEngine.Random;
 public class BoardManager : MonoBehaviour
 {
     #region PROPERTIES
-    private int rows;
-    private int columns;
-    private SPAWN_TYPES spawnType;
-    private List<BLOCK_TYPES> blockTypes;
-    private float spawnTime;
-    private int minMatchNumber;
-    private bool moving = false;
-    public Block[,] _grid;
+    private GameData gameData;
+    public bool blocksMoving;
+    public Block[,] grid;
 
     [Header("Prefabs")]
     [SerializeField] private GameObject tilePrefab;
@@ -27,39 +22,34 @@ public class BoardManager : MonoBehaviour
     #region METHODS
     void OnEnable()
     {
-        PlayerInput.OnMouseReleased += ClearBlocks;
+        PlayerInput.OnMouseReleased += TryMatch;
         UiGameplay.OnPlayButtonPressed += RestartGrid;
-        ReleaseBlock.OnDespawnAnimationDone += MoveGrid;
+        ReleaseBlock.OnDespawnAnimationDone += UpdateGrid;
     }
 
     void OnDisable()
     {
-        PlayerInput.OnMouseReleased -= ClearBlocks;
+        PlayerInput.OnMouseReleased -= TryMatch;
         UiGameplay.OnPlayButtonPressed -= RestartGrid;
-        ReleaseBlock.OnDespawnAnimationDone -= MoveGrid;
+        ReleaseBlock.OnDespawnAnimationDone -= UpdateGrid;
     }
 
     void Start()
     {
-        rows = GameManager.Get().rows;
-        columns = GameManager.Get().columns;
-        spawnType = GameManager.Get().spawnType;
-        blockTypes = GameManager.Get().blockTypes;
-        spawnTime = GameManager.Get().spawnTime;
-        minMatchNumber = GameManager.Get().minMatchNumber;
+        gameData = GameManager.Get().gameData;
 
         CreateGrid();
         CenterCameraOnGrid();
-        StartCoroutine(InstantiateBlocks(false));
+        StartCoroutine(SpawnBlocksOnGrid(false));
     }
 
     void CreateGrid()
     {
-        _grid = new Block[rows, columns];
+        this.grid = new Block[gameData.rows, gameData.columns];
         GameObject grid = new GameObject("Grid");
-        for (int i = 0; i < rows; i++)
+        for (int i = 0; i < gameData.rows; i++)
         {
-            for (int j = 0; j < columns; j++)
+            for (int j = 0; j < gameData.columns; j++)
             {
                 Vector2 position = new Vector2(j, i);
                 GameObject tile = Instantiate(tilePrefab, position, Quaternion.identity, grid.transform);
@@ -68,49 +58,44 @@ public class BoardManager : MonoBehaviour
         }
     }
 
-    void RestartGrid()
-    {
-        StartCoroutine(InstantiateBlocks(true));
-    }
-
     void CenterCameraOnGrid()
     {
         Camera camera = FindObjectOfType<Camera>();
-        int x = columns / 2;
-        int y = rows / 2;
+        int x = gameData.columns / 2;
+        int y = gameData.rows / 2;
         Vector3 position = new Vector3(x, y, -100);
         camera.transform.position = position;
     }
 
-    IEnumerator InstantiateBlocks(bool restart)
+    IEnumerator SpawnBlocksOnGrid(bool restart)
     {
-        BLOCK_TYPES[] previousLeft = new BLOCK_TYPES[rows];
+        BLOCK_TYPES[] previousLeft = new BLOCK_TYPES[gameData.rows];
         BLOCK_TYPES previousDown = BLOCK_TYPES.AIR;
 
         if (restart)
         {
-            for (int i = 0; i < rows; i++)
+            for (int i = 0; i < gameData.rows; i++)
             {
-                for (int j = 0; j < columns; j++)
+                for (int j = 0; j < gameData.columns; j++)
                 {
-                    if (_grid[i, j].active)
+                    if (grid[i, j].active)
                     {
-                        BlockObjectPool.Get().Pool.Release(_grid[i, j].prefab);
+                        BlockObjectPool.Get().Pool.Release(grid[i, j].prefab);
                     }
                 }
             }
         }
 
-        for (int i = 0; i < rows; i++)
+        for (int i = 0; i < gameData.rows; i++)
         {
-            for (int j = 0; j < columns; j++)
+            for (int j = 0; j < gameData.columns; j++)
             {
-                Vector2 position = spawnType switch
+                Vector2 position = gameData.spawnType switch
                 {
                     SPAWN_TYPES.LEFT_RIGHT_UP => new Vector2(j, i),
-                    SPAWN_TYPES.RIGHT_LEFT_UP => new Vector2(columns - 1 - j, i),
-                    SPAWN_TYPES.LEFT_RIGHT_DOWN => new Vector2(j, rows - 1 - i),
-                    SPAWN_TYPES.RIGHT_LEFT_DOWN => new Vector2(columns - 1 - j, rows - 1 - i),
+                    SPAWN_TYPES.RIGHT_LEFT_UP => new Vector2(gameData.columns - 1 - j, i),
+                    SPAWN_TYPES.LEFT_RIGHT_DOWN => new Vector2(j, gameData.rows - 1 - i),
+                    SPAWN_TYPES.RIGHT_LEFT_DOWN => new Vector2(gameData.columns - 1 - j, gameData.rows - 1 - i),
                     _ => throw new ArgumentOutOfRangeException()
                 };
 
@@ -121,12 +106,12 @@ public class BoardManager : MonoBehaviour
                 block.prefab.name = "Block";
                 block.active = true;
 
-                _grid[(int)position.y, (int)position.x] = block;
-                _grid[(int)position.y, (int)position.x].column = (int)position.x;
-                _grid[(int)position.y, (int)position.x].row = (int)position.y;
+                grid[(int)position.y, (int)position.x] = block;
+                grid[(int)position.y, (int)position.x].column = (int)position.x;
+                grid[(int)position.y, (int)position.x].row = (int)position.y;
 
                 List<BLOCK_TYPES> possibleBlocks = new List<BLOCK_TYPES>();
-                possibleBlocks.AddRange(blockTypes);
+                possibleBlocks.AddRange(gameData.blockTypes);
 
                 possibleBlocks.Remove(previousLeft[j]);
                 possibleBlocks.Remove(previousDown);
@@ -137,101 +122,70 @@ public class BoardManager : MonoBehaviour
                 previousLeft[j] = (BLOCK_TYPES)type;
                 previousDown = (BLOCK_TYPES)type;
 
-                yield return new WaitForSeconds(spawnTime);
+                yield return new WaitForSeconds(gameData.spawnTime);
             }
         }
 
         PlayerInput.allowed = true;
+    }
+
+    void RestartGrid()
+    {
+        StartCoroutine(SpawnBlocksOnGrid(true));
     }
 
     IEnumerator RefillGrid()
     {
         PlayerInput.allowed = false;
-        while (moving)
+        while (blocksMoving)
         {
-            yield return new WaitForSeconds(0.75f);
+            yield return new WaitForSeconds(0.8f);
         }
-        for (int j = 0; j < columns; j++)
+        for (int j = 0; j < gameData.columns; j++)
         {
             int emptyCount = 0;
-            for (int i = 0; i < rows; i++)
+            for (int i = 0; i < gameData.rows; i++)
             {
-                if (_grid[i, j].active) continue;
+                if (grid[i, j].active) continue;
                 emptyCount++;
-                _grid[i, j].prefab = BlockObjectPool.Get().Pool.Get();
-                _grid[i, j].prefab.transform.position = new Vector3(_grid[i, j].column, rows + emptyCount, 0);
-                _grid[i, j].prefab.transform.rotation = Quaternion.identity;
-                _grid[i, j].prefab.name = "Block";
-                _grid[i, j].SetBlockType(Random.Range(0, blockTypes.Count));
-                _grid[i, j].active = true;
-                StartCoroutine(DropBlock(_grid[i, j].prefab, rows + emptyCount, i));
+                grid[i, j].prefab = BlockObjectPool.Get().Pool.Get();
+                grid[i, j].prefab.transform.position = new Vector3(grid[i, j].column, gameData.rows + emptyCount, 0);
+                grid[i, j].prefab.transform.rotation = Quaternion.identity;
+                grid[i, j].prefab.name = "Block";
+                grid[i, j].SetBlockType(Random.Range(0, gameData.blockTypes.Count));
+                grid[i, j].active = true;
+                StartCoroutine(UpdateBlockPosition(grid[i, j].prefab, gameData.rows + emptyCount, i));
             }
         }
-        while (moving)
+        while (blocksMoving)
         {
-            yield return new WaitForSeconds(0.75f);
+            yield return new WaitForSeconds(0.8f);
         }
-        for (int i = 0; i < rows; i++)
+        for (int i = 0; i < gameData.rows; i++)
         {
-            for (int j = 0; j < columns; j++)
+            for (int j = 0; j < gameData.columns; j++)
             {
-                if (_grid[i, j].active)
+                if (grid[i, j].active)
                 {
-                    CheckMatches(_grid[i, j].prefab);
+                    CheckForCombos(grid[i, j].prefab);
                 }
             }
         }
-        yield return new WaitForSeconds(0.2f);
+
         PlayerInput.allowed = true;
         GameManager.Get().CheckForGameOver();
     }
 
-    void ClearCombo(List<GameObject> matchedBlocks)
+    void TryMatch(List<GameObject> selectedBlocks)
     {
-        OnMatch?.Invoke();
-        PlayerInput.allowed = false;
-        foreach (var block in matchedBlocks)
-        {
-            if (!block) continue;
-            _grid[(int)block.transform.position.y, (int)block.transform.position.x].active = false;
-            block.GetComponent<Animator>().SetTrigger("OnDespawn");
-        }
-        GameManager.Get().AddScore(matchedBlocks.Count);
-    }
-
-    List<Vector2> GetEmptyTiles()
-    {
-        List<Vector2> tiles = new List<Vector2>();
-        for (int i = 0; i < rows; i++) //Find empty tiles
-        {
-            for (int j = 0; j < columns; j++)
-            {
-                Collider2D block = Physics2D.OverlapPoint(new Vector2(j, i));
-                if (!block)
-                {
-                    tiles.Add(new Vector2(j, i));
-                }
-            }
-        }
-        return tiles;
-    }
-
-    void MoveGrid()
-    {
-        MoveGridDown();
-        StartCoroutine(RefillGrid());
-    }
-
-    void ClearBlocks(List<GameObject> selectedBlocks)
-    {
-        if (selectedBlocks.Count >= minMatchNumber)
+        if (selectedBlocks.Count >= gameData.minimumMatchNumber)
         {
             PlayerInput.allowed = false;
             OnMatch?.Invoke();
             foreach (var block in selectedBlocks)
             {
                 if (!block) continue;
-                _grid[(int)block.transform.position.y, (int)block.transform.position.x].active = false;
+                grid[(int)block.transform.position.y, (int)block.transform.position.x].active = false;
                 block.GetComponent<Animator>().SetTrigger("OnDespawn");
             }
             GameManager.Get().AddScore(selectedBlocks.Count);
@@ -250,18 +204,69 @@ public class BoardManager : MonoBehaviour
         OnClearBlocks?.Invoke();
     }
 
-    void CheckMatches(GameObject block)
+    void UpdateGrid()
+    {
+        ShiftBlocksDown();
+        StopCoroutine(RefillGrid());
+        StartCoroutine(RefillGrid());
+    }
+
+    void ShiftBlocksDown()
+    {
+        int tileCounter = 1;
+
+        for (int j = 0; j < gameData.columns; j++)
+        {
+            for (int i = 0; i < gameData.rows; i++)
+            {
+                if (i + tileCounter < gameData.rows && !grid[i, j].active)
+                {
+                    while (i + tileCounter < gameData.rows - 1 && !grid[i + tileCounter, j].active)
+                    {
+                        tileCounter++;
+                    }
+
+                    Block aux = grid[i, j];
+                    grid[i, j] = grid[i + tileCounter, j];
+                    grid[i, j].row = i;
+
+                    grid[i + tileCounter, j] = aux;
+                    grid[i + tileCounter, j].row = i + tileCounter;
+                    grid[i + tileCounter, j].active = false;
+
+                    StartCoroutine(UpdateBlockPosition(grid[i, j].prefab, i + tileCounter, i));
+                }
+                tileCounter = 1;
+            }
+        }
+    }
+
+    IEnumerator UpdateBlockPosition(GameObject block, float startY, float targetY)
+    {
+        blocksMoving = true;
+        float speed = 10f;
+        block.transform.position = new Vector3(block.transform.position.x, startY, 0);
+        while (block.transform.position.y > targetY)
+        {
+            block.transform.position -= speed * Time.deltaTime * new Vector3(0, 1, 0);
+            yield return new WaitForEndOfFrame();
+        }
+        block.transform.position = new Vector3(block.transform.position.x, targetY, block.transform.position.z);
+        blocksMoving = false;
+    }
+
+    void CheckForCombos(GameObject block)
     {
         List<GameObject> matchedBlocks = new List<GameObject>();
         bool matched = false;
         Vector2 pos = new Vector2(block.transform.position.x, block.transform.position.y);
         {
-            RaycastHit2D[] hitUp = Physics2D.RaycastAll(pos, Vector2.up, minMatchNumber - 1);
-            RaycastHit2D[] hitDown = Physics2D.RaycastAll(pos, Vector2.down, minMatchNumber - 1);
-            RaycastHit2D[] hitLeft = Physics2D.RaycastAll(pos, Vector2.left, minMatchNumber - 1);
-            RaycastHit2D[] hitRight = Physics2D.RaycastAll(pos, Vector2.right, minMatchNumber - 1);
+            RaycastHit2D[] hitUp = Physics2D.RaycastAll(pos, Vector2.up, gameData.minimumMatchNumber - 1);
+            RaycastHit2D[] hitDown = Physics2D.RaycastAll(pos, Vector2.down, gameData.minimumMatchNumber - 1);
+            RaycastHit2D[] hitLeft = Physics2D.RaycastAll(pos, Vector2.left, gameData.minimumMatchNumber - 1);
+            RaycastHit2D[] hitRight = Physics2D.RaycastAll(pos, Vector2.right, gameData.minimumMatchNumber - 1);
 
-            if (hitUp.All(blocks => blocks.transform.gameObject.CompareTag(block.tag) && hitUp.Length >= minMatchNumber))
+            if (hitUp.All(blocks => blocks.transform.gameObject.CompareTag(block.tag) && hitUp.Length >= gameData.minimumMatchNumber))
             {
                 for (int i = 0; i < hitUp.Length; i++)
                 {
@@ -270,7 +275,7 @@ public class BoardManager : MonoBehaviour
                 ClearCombo(matchedBlocks);
                 matched = true;
             }
-            if (hitDown.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitDown.Length >= minMatchNumber && !matched))
+            if (hitDown.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitDown.Length >= gameData.minimumMatchNumber && !matched))
             {
                 for (int i = 0; i < hitDown.Length; i++)
                 {
@@ -279,7 +284,7 @@ public class BoardManager : MonoBehaviour
                 ClearCombo(matchedBlocks);
                 matched = true;
             }
-            if (hitLeft.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitLeft.Length >= minMatchNumber && !matched))
+            if (hitLeft.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitLeft.Length >= gameData.minimumMatchNumber && !matched))
             {
                 for (int i = 0; i < hitLeft.Length; i++)
                 {
@@ -288,7 +293,7 @@ public class BoardManager : MonoBehaviour
                 ClearCombo(matchedBlocks);
                 matched = true;
             }
-            if (hitRight.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitRight.Length >= minMatchNumber && !matched))
+            if (hitRight.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitRight.Length >= gameData.minimumMatchNumber && !matched))
             {
                 for (int i = 0; i < hitRight.Length; i++)
                 {
@@ -300,48 +305,17 @@ public class BoardManager : MonoBehaviour
         }
     }
 
-    void MoveGridDown()
+    void ClearCombo(List<GameObject> matchedBlocks)
     {
-        int tileCounter = 1;
-
-        for (int j = 0; j < columns; j++)
+        OnMatch?.Invoke();
+        PlayerInput.allowed = false;
+        foreach (var block in matchedBlocks)
         {
-            for (int i = 0; i < rows; i++)
-            {
-                if (i + tileCounter < rows && !_grid[i, j].active)
-                {
-                    while (i + tileCounter < rows - 1 && !_grid[i + tileCounter, j].active)
-                    {
-                        tileCounter++;
-                    }
-
-                    Block aux = _grid[i, j];
-                    _grid[i, j] = _grid[i + tileCounter, j];
-                    _grid[i, j].row = i;
-
-                    _grid[i + tileCounter, j] = aux;
-                    _grid[i + tileCounter, j].row = i + tileCounter;
-                    _grid[i + tileCounter, j].active = false;
-
-                    StartCoroutine(DropBlock(_grid[i, j].prefab, i + tileCounter, i));
-                }
-                tileCounter = 1;
-            }
+            if (!block) continue;
+            grid[(int)block.transform.position.y, (int)block.transform.position.x].active = false;
+            block.GetComponent<Animator>().SetTrigger("OnDespawn");
         }
-    }
-
-    IEnumerator DropBlock(GameObject block, float startY, float targetY)
-    {
-        moving = true;
-        float speed = 6f;
-        block.transform.position = new Vector3(block.transform.position.x, startY, 0);
-        while (block.transform.position.y > targetY)
-        {
-            block.transform.position -= speed * Time.deltaTime * new Vector3(0, 1, 0);
-            yield return new WaitForEndOfFrame();
-        }
-        block.transform.position = new Vector3(block.transform.position.x, targetY, block.transform.position.z);
-        moving = false;
+        GameManager.Get().AddScore(matchedBlocks.Count);
     }
     #endregion
 }
