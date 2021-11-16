@@ -170,7 +170,7 @@ MonoBehaviour:
     rows: 8
     columns: 6
     minimumMatchNumber: 3
-    moves: 10
+    moves: 27
     blockTypes: 00000000010000000200000003000000
     spawnType: 0
     spawnTime: 0.05
@@ -621,6 +621,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32927582edaafdc419ba12faba15acb1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  blocksMoving: 0
   tilePrefab: {fileID: 2499393868194984505, guid: 625e604eec7462b429c98123c596bfa8, type: 3}
 --- !u!1 &805161200
 GameObject:
@@ -2005,7 +2006,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1311ac4a040ad8646bae1799927f8879, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  percentage: 0
 --- !u!1 &2147070721
 GameObject:
   m_ObjectHideFlags: 0

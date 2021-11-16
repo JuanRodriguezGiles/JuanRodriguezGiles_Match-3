@@ -17,6 +17,8 @@ public class BoardManager : MonoBehaviour
     public static event Action OnClearBlocks;
     public static event Action OnMatch;
     public static event Action OnNoMatch;
+
+    private GameObject blocksParent;
     #endregion
 
     #region METHODS
@@ -37,6 +39,7 @@ public class BoardManager : MonoBehaviour
     void Start()
     {
         gameData = GameManager.Get().gameData;
+        blocksParent = new GameObject("Blocks");
 
         CreateGrid();
         CenterCameraOnGrid();
@@ -104,6 +107,7 @@ public class BoardManager : MonoBehaviour
                 block.prefab.transform.position = position;
                 block.prefab.transform.rotation = Quaternion.identity;
                 block.prefab.name = "Block";
+                block.prefab.transform.parent = blocksParent.transform;
                 block.active = true;
 
                 grid[(int)position.y, (int)position.x] = block;
@@ -137,10 +141,12 @@ public class BoardManager : MonoBehaviour
     IEnumerator RefillGrid()
     {
         PlayerInput.allowed = false;
+
         while (blocksMoving)
         {
-            yield return new WaitForSeconds(0.8f);
+            yield return new WaitForSeconds(1);
         }
+
         for (int j = 0; j < gameData.columns; j++)
         {
             int emptyCount = 0;
@@ -152,15 +158,18 @@ public class BoardManager : MonoBehaviour
                 grid[i, j].prefab.transform.position = new Vector3(grid[i, j].column, gameData.rows + emptyCount, 0);
                 grid[i, j].prefab.transform.rotation = Quaternion.identity;
                 grid[i, j].prefab.name = "Block";
+                grid[i, j].prefab.transform.parent = blocksParent.transform;
                 grid[i, j].SetBlockType(Random.Range(0, gameData.blockTypes.Count));
                 grid[i, j].active = true;
                 StartCoroutine(UpdateBlockPosition(grid[i, j].prefab, gameData.rows + emptyCount, i));
             }
         }
+
         while (blocksMoving)
         {
-            yield return new WaitForSeconds(0.8f);
+            yield return new WaitForSeconds(1);
         }
+
         for (int i = 0; i < gameData.rows; i++)
         {
             for (int j = 0; j < gameData.columns; j++)
@@ -244,7 +253,7 @@ public class BoardManager : MonoBehaviour
     IEnumerator UpdateBlockPosition(GameObject block, float startY, float targetY)
     {
         blocksMoving = true;
-        float speed = 10f;
+        float speed = 15;
         block.transform.position = new Vector3(block.transform.position.x, startY, 0);
         while (block.transform.position.y > targetY)
         {
@@ -258,51 +267,94 @@ public class BoardManager : MonoBehaviour
     void CheckForCombos(GameObject block)
     {
         List<GameObject> matchedBlocks = new List<GameObject>();
-        bool matched = false;
-        Vector2 pos = new Vector2(block.transform.position.x, block.transform.position.y);
-        {
-            RaycastHit2D[] hitUp = Physics2D.RaycastAll(pos, Vector2.up, gameData.minimumMatchNumber - 1);
-            RaycastHit2D[] hitDown = Physics2D.RaycastAll(pos, Vector2.down, gameData.minimumMatchNumber - 1);
-            RaycastHit2D[] hitLeft = Physics2D.RaycastAll(pos, Vector2.left, gameData.minimumMatchNumber - 1);
-            RaycastHit2D[] hitRight = Physics2D.RaycastAll(pos, Vector2.right, gameData.minimumMatchNumber - 1);
+        Vector2 position = new Vector2(block.transform.position.x, block.transform.position.y);
 
-            if (hitUp.All(blocks => blocks.transform.gameObject.CompareTag(block.tag) && hitUp.Length >= gameData.minimumMatchNumber))
-            {
-                for (int i = 0; i < hitUp.Length; i++)
-                {
-                    matchedBlocks.Add(hitUp[i].transform.gameObject);
-                }
-                ClearCombo(matchedBlocks);
-                matched = true;
-            }
-            if (hitDown.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitDown.Length >= gameData.minimumMatchNumber && !matched))
-            {
-                for (int i = 0; i < hitDown.Length; i++)
-                {
-                    matchedBlocks.Add(hitDown[i].transform.gameObject);
-                }
-                ClearCombo(matchedBlocks);
-                matched = true;
-            }
-            if (hitLeft.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitLeft.Length >= gameData.minimumMatchNumber && !matched))
-            {
-                for (int i = 0; i < hitLeft.Length; i++)
-                {
-                    matchedBlocks.Add(hitLeft[i].transform.gameObject);
-                }
-                ClearCombo(matchedBlocks);
-                matched = true;
-            }
-            if (hitRight.All(_blocks => _blocks.transform.gameObject.CompareTag(block.tag) && hitRight.Length >= gameData.minimumMatchNumber && !matched))
-            {
-                for (int i = 0; i < hitRight.Length; i++)
-                {
-                    matchedBlocks.Add(hitRight[i].transform.gameObject);
-                }
-                ClearCombo(matchedBlocks);
-                matched = true;
-            }
+        {
+            //RaycastHit2D[] hitUp = Physics2D.RaycastAll(pos, Vector2.up, gameData.minimumMatchNumber - 1);
+            //RaycastHit2D[] hitDown = Physics2D.RaycastAll(pos, Vector2.down, gameData.minimumMatchNumber - 1);
+            //RaycastHit2D[] hitLeft = Physics2D.RaycastAll(pos, Vector2.left, gameData.minimumMatchNumber - 1);
+            //RaycastHit2D[] hitRight = Physics2D.RaycastAll(pos, Vector2.right, gameData.minimumMatchNumber - 1);
+
+            //if (hitUp.All(blocks =>
+            //    blocks.transform.gameObject.CompareTag(block.tag) && hitUp.Length >= gameData.minimumMatchNumber))
+            //{
+            //    for (int i = 0; i < hitUp.Length; i++)
+            //    {
+            //        matchedBlocks.Add(hitUp[i].transform.gameObject);
+            //    }
+
+            //    ClearCombo(matchedBlocks);
+            //    matched = true;
+            //}
+
+            //if (hitDown.All(blocks =>
+            //    blocks.transform.gameObject.CompareTag(block.tag) && hitDown.Length >= gameData.minimumMatchNumber &&
+            //    !matched))
+            //{
+            //    for (int i = 0; i < hitDown.Length; i++)
+            //    {
+            //        matchedBlocks.Add(hitDown[i].transform.gameObject);
+            //    }
+
+            //    ClearCombo(matchedBlocks);
+            //    matched = true;
+            //}
+
+            //if (hitLeft.All(blocks =>
+            //    blocks.transform.gameObject.CompareTag(block.tag) && hitLeft.Length >= gameData.minimumMatchNumber &&
+            //    !matched))
+            //{
+            //    for (int i = 0; i < hitLeft.Length; i++)
+            //    {
+            //        matchedBlocks.Add(hitLeft[i].transform.gameObject);
+            //    }
+
+            //    ClearCombo(matchedBlocks);
+            //    matched = true;
+            //}
+
+            //if (hitRight.All(blocks =>
+            //    blocks.transform.gameObject.CompareTag(block.tag) && hitRight.Length >= gameData.minimumMatchNumber &&
+            //    !matched))
+            //{
+            //    for (int i = 0; i < hitRight.Length; i++)
+            //    {
+            //        matchedBlocks.Add(hitRight[i].transform.gameObject);
+            //    }
+
+            //    ClearCombo(matchedBlocks);
+            //    matched = true;
+            //}
         }
+
+        bool matched = IsMatchPossible(position, Vector2.up, gameData.minimumMatchNumber - 1, block.tag);
+        if (!matched)
+        {
+            matched = IsMatchPossible(position, Vector2.down, gameData.minimumMatchNumber - 1, block.tag);
+        }
+        if (!matched)
+        {
+            matched = IsMatchPossible(position, Vector2.left, gameData.minimumMatchNumber - 1, block.tag);
+        }
+        if (!matched)
+        {
+            IsMatchPossible(position, Vector2.right, gameData.minimumMatchNumber - 1, block.tag);
+        }
+    }
+
+    bool IsMatchPossible(Vector2 origin, Vector2 direction, float distance, string blockTag)
+    {
+        RaycastHit2D[] hits = Physics2D.RaycastAll(origin, direction, distance);
+
+        if (!hits.All(blocks => blocks.transform.gameObject.CompareTag(blockTag) && hits.Length >= distance + 1))
+        {
+            return false;
+        }
+
+        List<GameObject> matchedBlocks = hits.Select(block => block.transform.gameObject).ToList();
+        ClearCombo(matchedBlocks);
+
+        return true;
     }
 
     void ClearCombo(List<GameObject> matchedBlocks)
