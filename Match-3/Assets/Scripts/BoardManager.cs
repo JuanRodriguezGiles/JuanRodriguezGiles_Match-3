@@ -8,8 +8,8 @@ public class BoardManager : MonoBehaviour
 {
     #region PROPERTIES
     private GameData gameData;
-    public bool blocksMoving;
-    public Block[,] grid;
+    private bool blocksMoving;
+    private Block[,] grid;
 
     [Header("Prefabs")]
     [SerializeField] private GameObject tilePrefab;
@@ -268,64 +268,6 @@ public class BoardManager : MonoBehaviour
     {
         List<GameObject> matchedBlocks = new List<GameObject>();
         Vector2 position = new Vector2(block.transform.position.x, block.transform.position.y);
-
-        {
-            //RaycastHit2D[] hitUp = Physics2D.RaycastAll(pos, Vector2.up, gameData.minimumMatchNumber - 1);
-            //RaycastHit2D[] hitDown = Physics2D.RaycastAll(pos, Vector2.down, gameData.minimumMatchNumber - 1);
-            //RaycastHit2D[] hitLeft = Physics2D.RaycastAll(pos, Vector2.left, gameData.minimumMatchNumber - 1);
-            //RaycastHit2D[] hitRight = Physics2D.RaycastAll(pos, Vector2.right, gameData.minimumMatchNumber - 1);
-
-            //if (hitUp.All(blocks =>
-            //    blocks.transform.gameObject.CompareTag(block.tag) && hitUp.Length >= gameData.minimumMatchNumber))
-            //{
-            //    for (int i = 0; i < hitUp.Length; i++)
-            //    {
-            //        matchedBlocks.Add(hitUp[i].transform.gameObject);
-            //    }
-
-            //    ClearCombo(matchedBlocks);
-            //    matched = true;
-            //}
-
-            //if (hitDown.All(blocks =>
-            //    blocks.transform.gameObject.CompareTag(block.tag) && hitDown.Length >= gameData.minimumMatchNumber &&
-            //    !matched))
-            //{
-            //    for (int i = 0; i < hitDown.Length; i++)
-            //    {
-            //        matchedBlocks.Add(hitDown[i].transform.gameObject);
-            //    }
-
-            //    ClearCombo(matchedBlocks);
-            //    matched = true;
-            //}
-
-            //if (hitLeft.All(blocks =>
-            //    blocks.transform.gameObject.CompareTag(block.tag) && hitLeft.Length >= gameData.minimumMatchNumber &&
-            //    !matched))
-            //{
-            //    for (int i = 0; i < hitLeft.Length; i++)
-            //    {
-            //        matchedBlocks.Add(hitLeft[i].transform.gameObject);
-            //    }
-
-            //    ClearCombo(matchedBlocks);
-            //    matched = true;
-            //}
-
-            //if (hitRight.All(blocks =>
-            //    blocks.transform.gameObject.CompareTag(block.tag) && hitRight.Length >= gameData.minimumMatchNumber &&
-            //    !matched))
-            //{
-            //    for (int i = 0; i < hitRight.Length; i++)
-            //    {
-            //        matchedBlocks.Add(hitRight[i].transform.gameObject);
-            //    }
-
-            //    ClearCombo(matchedBlocks);
-            //    matched = true;
-            //}
-        }
 
         bool matched = IsMatchPossible(position, Vector2.up, gameData.minimumMatchNumber - 1, block.tag);
         if (!matched)
