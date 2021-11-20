@@ -42,7 +42,6 @@ public class BoardManager : MonoBehaviour
         blocksParent = new GameObject("Blocks");
 
         CreateGrid();
-        //CenterCameraOnGrid();
         StartCoroutine(SpawnBlocksOnGrid(false));
     }
 
@@ -59,15 +58,6 @@ public class BoardManager : MonoBehaviour
                 tile.name = "Tile " + i + " " + j;
             }
         }
-    }
-
-    void CenterCameraOnGrid()
-    {
-        Camera camera = FindObjectOfType<Camera>();
-        int x = gameData.columns / 2;
-        int y = gameData.rows / 2;
-        Vector3 position = new Vector3(x, y, -100);
-        camera.transform.position = position;
     }
 
     IEnumerator SpawnBlocksOnGrid(bool restart)

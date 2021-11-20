@@ -1,5 +1,5 @@
 using UnityEngine;
-public class SfxController : MonoBehaviourSingleton<SfxController>
+public class SfxController : MonoBehaviour
 {
     #region PROPERTIES
     [SerializeField] private AudioClip select;
@@ -34,24 +34,28 @@ public class SfxController : MonoBehaviourSingleton<SfxController>
     void PlaySelectSound(GameObject block)
     {
         audioSource.clip = select;
+        audioSource.pitch = 1;
         audioSource.Play();
     }
 
-    void PlayDeselectSound() //TODO play sound when only 1 block is deselected
+    void PlayDeselectSound()
     {
         audioSource.clip = deselect;
+        audioSource.pitch = 2;
         audioSource.Play();
     }
 
     void PlayMatchSound()
     {
         audioSource.clip = match;
+        audioSource.pitch = 1;
         audioSource.Play();
     }
 
     void PlayNoMatchSound()
     {
         audioSource.clip = noMatch;
+        audioSource.pitch = 1;
         audioSource.Play();
     }
     #endregion

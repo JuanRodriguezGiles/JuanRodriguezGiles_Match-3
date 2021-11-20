@@ -11,7 +11,7 @@ public enum SPAWN_TYPES
 [Serializable]
 public struct GameData
 {
-    [Range(6, 8)] public int rows;
+    [Range(6, 10)] public int rows;
     [Range(4, 6)] public int columns;
     [Range(2, 10)] public int minimumMatchNumber;
     [Range(1, 100)] public int moves;
