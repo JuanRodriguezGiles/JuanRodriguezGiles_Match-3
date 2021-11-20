@@ -2,7 +2,7 @@ using UnityEngine;
 public class SoundtrackController : MonoBehaviour
 {
     #region PROPERTIES
-    private int maxMoves;
+    private int maxMoves = 10;
     private AudioSource audioSource;
     private float percentage;
     #endregion
@@ -21,9 +21,7 @@ public class SoundtrackController : MonoBehaviour
 
     void ChangePitch(int moves)
     {
-        maxMoves = maxMoves == 0 ? moves : maxMoves;
-
-        percentage = (moves / maxMoves) * 100;
+        percentage = ((float)moves / (float)maxMoves) * 100;
         if (moves == 0)
         {
             audioSource.pitch = 1;
