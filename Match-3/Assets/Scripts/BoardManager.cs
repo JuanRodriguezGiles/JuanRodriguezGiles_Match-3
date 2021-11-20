@@ -42,7 +42,7 @@ public class BoardManager : MonoBehaviour
         blocksParent = new GameObject("Blocks");
 
         CreateGrid();
-        CenterCameraOnGrid();
+        //CenterCameraOnGrid();
         StartCoroutine(SpawnBlocksOnGrid(false));
     }
 
